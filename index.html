@@ -3,73 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Time Reclaim & Routine Maximizer | Liquid Glass App</title>
-  <meta name="description" content="Prendi il controllo del tuo tempo, elimina il tempo sprecato sui social media e riconquista le tue ore per quello che ami: studio, sport, cinema, relazioni e rigenerazione.">
+  <title>TimeReclaim | Gestione Intenzionale delle 24 Ore</title>
+  <meta name="description" content="Mappa la tua routine, elimina il tempo perso sui social media e riconquista le tue ore per quello che ami.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- FontAwesome Icons for UI -->
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Supabase JS Client SDK -->
+  <!-- Supabase Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Main Liquid Glass Stylesheet -->
+  <!-- Main Stylesheet -->
   <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
 
-  <!-- Dynamic Fluid Background Aurora Mesh -->
+  <!-- Aurora Background Animation -->
   <div class="aurora-container">
     <div class="aurora-orb aurora-orb-1"></div>
     <div class="aurora-orb aurora-orb-2"></div>
-    <div class="aurora-orb aurora-orb-3"></div>
   </div>
 
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <div class="app-container">
-    <!-- Navbar Header -->
+    <!-- Navbar Header (Mobile First) -->
     <header class="navbar">
-      <a href="#" class="brand">
-        <div class="brand-logo">
-          <i class="fa-solid fa-hourglass-half"></i>
-        </div>
-        <div class="brand-text">
-          <h1>TimeReclaim</h1>
-          <p>Own Your 24 Hours</p>
-        </div>
-      </a>
-
-      <div class="nav-controls">
-        <nav class="nav-tabs">
-          <button class="nav-btn active" data-tab="dashboard">
-            <i class="fa-solid fa-chart-pie"></i> Dashboard
-          </button>
-          <button class="nav-btn" data-tab="weekly">
-            <i class="fa-solid fa-calendar-week"></i> Settimana & Timeline
-          </button>
-          <button class="nav-btn" data-tab="wizard">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Setup Routine
-          </button>
-          <button class="nav-btn" data-tab="detox">
-            <i class="fa-solid fa-mobile-screen-button"></i> Social Audit
-          </button>
-          <button class="nav-btn" data-tab="bank">
-            <i class="fa-solid fa-heart-pulse"></i> Time Bank
-          </button>
-        </nav>
-
-        <button class="btn-glass btn-sm" id="openVisionModal" style="border-color: rgba(0, 242, 254, 0.4); color: var(--accent-cyan);">
-          <i class="fa-solid fa-lightbulb"></i> Visione & Need
-        </button>
+      <div class="navbar-top">
+        <a href="#" class="brand">
+          <div class="brand-logo"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="brand-text">
+            <h1>TimeReclaim</h1>
+            <p>Own Your 24 Hours</p>
+          </div>
+        </a>
 
         <button class="user-profile-btn" id="openAuthModal">
           <div class="user-avatar" id="navAvatar">TR</div>
-          <span class="user-name" id="navUserName">Accedi / Registrati</span>
+          <span class="user-name" id="navUserName">Accedi</span>
         </button>
       </div>
+
+      <!-- Main Navigation Tabs (3 Clean Sections) -->
+      <nav class="nav-tabs">
+        <button class="nav-btn active" data-tab="dashboard">
+          <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </button>
+        <button class="nav-btn" data-tab="wizard">
+          <i class="fa-solid fa-sliders"></i> Routine
+        </button>
+        <button class="nav-btn" data-tab="bank">
+          <i class="fa-solid fa-box-archive"></i> Banca Attività
+        </button>
+      </nav>
     </header>
 
     <!-- MAIN VIEWS CONTAINER -->
@@ -83,83 +74,88 @@
         <!-- Metrics Row -->
         <div class="stats-cards-row">
           <div class="stat-card">
-            <div class="stat-icon" style="background: var(--grad-productive);">
-              <i class="fa-solid fa-bolt"></i>
-            </div>
+            <div class="stat-icon" style="background: var(--accent-cyan);"><i class="fa-solid fa-bolt"></i></div>
             <div class="stat-info">
               <h3 id="statAwakeHours">16.0 h</h3>
-              <p>Ore di Veglia Utili</p>
+              <p>Veglia Utile</p>
             </div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-icon" style="background: var(--grad-social-waste);">
-              <i class="fa-solid fa-shield-halved"></i>
-            </div>
+            <div class="stat-icon" style="background: var(--accent-pink);"><i class="fa-solid fa-shield-halved"></i></div>
             <div class="stat-info">
               <h3 id="statReclaimedHours">2.5 h</h3>
-              <p>Riconquistate dai Social</p>
+              <p>Riconquistate</p>
             </div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-icon" style="background: var(--grad-relations);">
-              <i class="fa-solid fa-heart"></i>
-            </div>
+            <div class="stat-icon" style="background: var(--accent-amber);"><i class="fa-solid fa-heart"></i></div>
             <div class="stat-info">
               <h3 id="statRelationScore">85%</h3>
-              <p>Indice Connessioni & Vita</p>
+              <p>Indice Vita</p>
             </div>
           </div>
         </div>
 
-        <!-- Hourly Timeline Preview Banner on Dashboard -->
-        <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1.25rem 1.75rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-            <h4 style="font-family: var(--font-heading); font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fa-solid fa-timeline" style="color: var(--accent-cyan);"></i>
-              Fasce Orarie Libere Oggi (Timeline 00-24)
-            </h4>
-            <span class="badge badge-cyan" id="bestFreeTimeSlotBadge">Fascia migliore: 18:00 - 21:00</span>
+        <!-- 24h Timeline Widget with Clear Legend -->
+        <div class="glass-card">
+          <div class="card-header" style="margin-bottom: 0.5rem;">
+            <div>
+              <h2 class="card-title">
+                <i class="fa-solid fa-timeline" style="color: var(--accent-cyan);"></i>
+                Mappa delle 24 Ore Oggi
+              </h2>
+              <p class="card-subtitle">Identifica visivamente le fasce orarie in cui sei più libero</p>
+            </div>
           </div>
 
+          <!-- 24 Hourly Time Slots Grid -->
           <div class="timeline-24h-grid" id="dashboardHourlyGrid">
-            <!-- 24 Hourly blocks rendered dynamically -->
+            <!-- Rendered dynamically -->
           </div>
 
-          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-            <span>00:00 Notte</span>
-            <span>06:00 Risveglio</span>
-            <span>12:00 Pomeriggio</span>
-            <span>18:00 Sera</span>
-            <span>23:00 Notte</span>
+          <!-- Timeline Color Legend -->
+          <div class="timeline-legend">
+            <div class="legend-item">
+              <div class="legend-color-dot" style="background: rgba(142, 45, 226, 0.7);"></div>
+              <span>🌙 Sonno (00-07)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color-dot" style="background: rgba(59, 130, 246, 0.7);"></div>
+              <span>💼 Lavoro/Impegni (08-17)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color-dot" style="background: rgba(255, 0, 127, 0.8);"></div>
+              <span>📱 Social Residui (17-18)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color-dot" style="background: var(--accent-cyan);"></div>
+              <span>✨ Tempo Libero Intenzionale (18-23)</span>
+            </div>
           </div>
         </div>
 
         <div class="dashboard-grid">
-          <!-- Left Column: 24h Circular Ring & Harmony -->
-          <div class="dashboard-left" style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <!-- Left Column: Circular Donut Chart & Harmony -->
+          <div class="dashboard-left">
             
-            <!-- 24-Hour Circular SVG Visual Wheel Card -->
             <div class="glass-card">
-              <div class="glass-card-glow"></div>
               <div class="card-header">
                 <div>
-                  <h2 class="card-title">
-                    <i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-cyan);"></i>
-                    Matrice delle 24 Ore
-                  </h2>
-                  <p class="card-subtitle">Visualizzazione circolare della tua routine quotidiana</p>
+                  <h3 class="card-title">
+                    <i class="fa-solid fa-chart-pie" style="color: var(--accent-cyan);"></i>
+                    Ripartizione delle 24h
+                  </h3>
+                  <p class="card-subtitle">Visualizzazione sintetica della tua giornata</p>
                 </div>
-                <button class="btn-glass btn-sm" id="btnEditRoutine">
-                  <i class="fa-solid fa-pen-to-square"></i> Modifica Routine
-                </button>
+                <button class="btn-glass btn-sm" id="btnEditRoutine">Modifica</button>
               </div>
 
               <div class="time-wheel-container">
                 <div class="time-wheel-svg-wrapper">
                   <svg id="timeWheelSvg" viewBox="0 0 200 200" width="100%" height="100%">
-                    <!-- Dynamic SVG Donut Paths Rendered via JS -->
+                    <!-- Dynamic SVG arcs rendered via JS -->
                   </svg>
                   <div class="time-wheel-center-info">
                     <div class="wheel-big-val" id="wheelFreeTimeDisplay">4.5h</div>
@@ -168,185 +164,53 @@
                 </div>
               </div>
 
-              <!-- Categories Color Breakdown Grid -->
               <div class="categories-breakdown" id="categoriesBreakdownList">
                 <!-- Rendered dynamically -->
               </div>
             </div>
 
-            <!-- Harmony Balance Bar Card -->
+            <!-- Harmony Balance Bar -->
             <div class="glass-card">
               <div class="card-header">
-                <div>
-                  <h3 class="card-title">
-                    <i class="fa-solid fa-scale-balanced" style="color: var(--accent-amber);"></i>
-                    Equilibrio & Armonia Quotidiana
-                  </h3>
-                  <p class="card-subtitle">Bilanciamento tra impegni, crescita, relax e rigenerazione</p>
-                </div>
-                <span class="badge badge-emerald" id="harmonyStatusBadge">In Ottimo Equilibrio</span>
+                <h3 class="card-title"><i class="fa-solid fa-scale-balanced" style="color: var(--accent-amber);"></i> Bilanciamento Vita & Relax</h3>
+                <span class="badge badge-emerald" id="harmonyStatusBadge">Bilanciato</span>
               </div>
-
-              <div class="harmony-bar-container" id="harmonyBar">
-                <!-- Segments rendered dynamically -->
-              </div>
-
-              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
-                <span><i class="fa-solid fa-circle" style="color: var(--accent-cyan); font-size: 0.6rem;"></i> Produttivo/Crescita</span>
-                <span><i class="fa-solid fa-circle" style="color: var(--accent-purple); font-size: 0.6rem;"></i> Svago/Cinema</span>
-                <span><i class="fa-solid fa-circle" style="color: var(--accent-amber); font-size: 0.6rem;"></i> Relazioni</span>
-                <span><i class="fa-solid fa-circle" style="color: #70e000; font-size: 0.6rem;"></i> Noia/Riposo</span>
-              </div>
+              <div class="harmony-bar-container" id="harmonyBar"></div>
             </div>
 
           </div>
 
-          <!-- Right Column: Daily Actions & Social Detox Challenge -->
-          <div class="dashboard-right" style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <!-- Right Column: Daily Checklist & Social Impact -->
+          <div class="dashboard-right">
             
-            <!-- Daily Actions Checklist -->
             <div class="glass-card">
               <div class="card-header">
-                <div>
-                  <h3 class="card-title">
-                    <i class="fa-solid fa-list-check" style="color: var(--accent-emerald);"></i>
-                    Piano Intenzionale Oggi
-                  </h3>
-                  <p class="card-subtitle">Completa le attività che hai pianificato</p>
-                </div>
+                <h3 class="card-title"><i class="fa-solid fa-list-check" style="color: var(--accent-emerald);"></i> Da Fare Oggi</h3>
               </div>
-
-              <div class="checklist-container" id="dailyChecklist">
-                <!-- Rendered dynamically -->
-              </div>
+              <div class="checklist-container" id="dailyChecklist"></div>
             </div>
 
             <!-- Social Detox Impact Card -->
             <div class="glass-card detox-impact-card">
               <div class="card-header">
-                <div>
-                  <h3 class="card-title" style="color: #fff;">
-                    <i class="fa-solid fa-fire" style="color: var(--accent-pink);"></i>
-                    Impatto Anti-Social
-                  </h3>
-                  <p class="card-subtitle">Il valore reale delle ore riconquistate</p>
-                </div>
+                <h3 class="card-title" style="color: #fff;"><i class="fa-solid fa-fire" style="color: var(--accent-pink);"></i> Impatto Anti-Social</h3>
               </div>
-
-              <p style="font-size: 0.85rem; color: #e2e8f0;">
-                Riducendo lo scroll compulsivo sui social media, questa settimana hai sbloccato:
-              </p>
-
+              <p style="font-size: 0.8rem; color: #e2e8f0;">Ore riconquistate dallo scroll passivo:</p>
               <div class="detox-metrics-grid">
                 <div class="detox-metric-box">
-                  <h6>Settimanali Riconquistate</h6>
+                  <h6>Settimanali</h6>
                   <p id="detoxWeeklyHours">17.5 h</p>
                 </div>
                 <div class="detox-metric-box">
-                  <h6>Libri/Corsi Equivalenti</h6>
+                  <h6>Libri/Corsi</h6>
                   <p id="detoxBooksEquiv">1.2 Vol</p>
                 </div>
-                <div class="detox-metric-box">
-                  <h6>Allenamenti Completi</h6>
-                  <p id="detoxWorkoutsEquiv">11 Sessioni</p>
-                </div>
-                <div class="detox-metric-box">
-                  <h6>Tempo con Amici/Partner</h6>
-                  <p id="detoxRelationsEquiv">+12 Ore</p>
-                </div>
               </div>
             </div>
 
           </div>
         </div>
 
-      </section>
-
-      <!-- ==========================================
-           VIEW 5: VISTA SETTIMANALE & FASCE ORARIE (NEW)
-           ========================================== -->
-      <section id="view-weekly" class="view-section">
-        <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
-          
-          <!-- Header Preset Selector -->
-          <div class="glass-card">
-            <div class="card-header" style="margin-bottom: 0;">
-              <div>
-                <h2 class="card-title">
-                  <i class="fa-solid fa-calendar-week" style="color: var(--accent-cyan);"></i>
-                  Routine Settimanale & Fasce Orarie
-                </h2>
-                <p class="card-subtitle">Confronta la tua disponibilità giorno per giorno e scopri quando sei più libero</p>
-              </div>
-
-              <!-- Preset Toggle Switch -->
-              <div class="nav-tabs">
-                <button class="nav-btn active" id="btnPresetFeriale">💼 Feriale (Lun-Ven)</button>
-                <button class="nav-btn" id="btnPresetFestivo">🎉 Festivo (Sab-Dom)</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 7-Days Weekly Availability Grid -->
-          <div class="glass-card">
-            <div class="card-header">
-              <h3 class="card-title">
-                <i class="fa-solid fa-chart-bar" style="color: var(--accent-emerald);"></i>
-                Panoramica Giorno per Giorno (Lunedì - Domenica)
-              </h3>
-              <span class="badge badge-emerald">Media Libera: 4.8h / giorno</span>
-            </div>
-
-            <div class="weekly-days-grid" id="weeklyDaysGrid">
-              <!-- Rendered dynamically via JS -->
-            </div>
-          </div>
-
-          <!-- Detailed Hourly Time Slots Heatmap Breakdown -->
-          <div class="glass-card">
-            <div class="card-header">
-              <div>
-                <h3 class="card-title">
-                  <i class="fa-solid fa-clock" style="color: var(--accent-amber);"></i>
-                  Heatmap delle Fasce Orarie Libere
-                </h3>
-                <p class="card-subtitle">Passa con il mouse sulle ore per vedere cosa hai programmato in quella fascia</p>
-              </div>
-            </div>
-
-            <div class="timeline-24h-grid" id="fullWeeklyHourlyGrid" style="height: 60px;">
-              <!-- 24 Interactive slots rendered dynamically -->
-            </div>
-
-            <div style="display: flex; justify-content: space-around; font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
-              <span><i class="fa-solid fa-square" style="color: rgba(142, 45, 226, 0.7);"></i> 00:00 - 07:00 (Sonno)</span>
-              <span><i class="fa-solid fa-square" style="color: rgba(59, 130, 246, 0.7);"></i> 08:00 - 17:00 (Lavoro & Commute)</span>
-              <span><i class="fa-solid fa-square" style="color: rgba(255, 0, 127, 0.8);"></i> 17:00 - 18:00 (Social Residuo)</span>
-              <span><i class="fa-solid fa-square" style="color: var(--accent-cyan);"></i> 18:00 - 23:00 (Fascia Libera Intenzionale!)</span>
-            </div>
-          </div>
-
-          <!-- Relational Goals Tracker Widget -->
-          <div class="glass-card">
-            <div class="card-header">
-              <div>
-                <h3 class="card-title">
-                  <i class="fa-solid fa-user-group" style="color: var(--accent-pink);"></i>
-                  Relazioni & Incontri Reali Programmati
-                </h3>
-                <p class="card-subtitle">Usa il tempo riconquistato per coltivare le tue relazioni vere</p>
-              </div>
-              <button class="btn-glass btn-sm btn-primary" id="btnAddRelationGoal">
-                <i class="fa-solid fa-plus"></i> Programma Incontro
-              </button>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem;" id="relationalGoalsGrid">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-        </div>
       </section>
 
       <!-- ==========================================
@@ -355,316 +219,160 @@
       <section id="view-wizard" class="view-section">
         <div class="wizard-container">
           
-          <div class="glass-card" style="margin-bottom: 2rem;">
+          <div class="glass-card" style="margin-bottom: 1rem;">
             <div class="card-header" style="margin-bottom: 0;">
               <div>
-                <h2 class="card-title">
-                  <i class="fa-solid fa-sliders" style="color: var(--accent-cyan);"></i>
-                  Configura la tua Routine Quotidiana
-                </h2>
-                <p class="card-subtitle">Mappa le tue 24 ore a partire dai vincoli fino ad allocare il tempo libero desiderato</p>
+                <h2 class="card-title"><i class="fa-solid fa-sliders" style="color: var(--accent-cyan);"></i> Configura la tua Routine</h2>
+                <p class="card-subtitle">Mappa le tue 24 ore in 4 semplici passaggi</p>
               </div>
             </div>
           </div>
 
-          <!-- Wizard Progress Steps -->
           <div class="wizard-progress">
-            <div class="wizard-progress-bar">
-              <div class="wizard-progress-fill" id="wizardProgressFill"></div>
-            </div>
-            
+            <div class="wizard-progress-bar"><div class="wizard-progress-fill" id="wizardProgressFill"></div></div>
             <div class="step-indicator active" data-step="1">1</div>
             <div class="step-indicator" data-step="2">2</div>
             <div class="step-indicator" data-step="3">3</div>
             <div class="step-indicator" data-step="4">4</div>
           </div>
 
-          <!-- STEP 1: SLEEP & WAKE HOURS -->
+          <!-- STEP 1: SLEEP -->
           <div class="wizard-step-content active" id="wizardStep1">
             <div class="glass-card">
               <div class="card-header">
-                <div>
-                  <h3 class="card-title">Passo 1: Ore di Sonno e Veglia</h3>
-                  <p class="card-subtitle">Definisci quante ore dormi per calcolare la tua finestra di veglia reale.</p>
-                </div>
+                <h3 class="card-title">Passo 1: Sonno e Veglia</h3>
                 <span class="badge badge-cyan">Ore Base</span>
               </div>
-
               <div class="form-group">
                 <label class="form-label">Ore di Sonno per Notte</label>
-                <p class="form-hint">Un sonno di qualità (7-8 ore) è fondamentale per la produttività e la lucidità mentale.</p>
                 <div class="range-container">
-                  <div class="range-val-display">
-                    <span>Sonno programmato:</span>
-                    <span id="sleepHoursVal">8.0 Ore</span>
-                  </div>
+                  <div class="range-val-display"><span>Sonno:</span><span id="sleepHoursVal">8.0 Ore</span></div>
                   <input type="range" class="input-range" id="sleepHoursInput" min="5" max="11" step="0.5" value="8">
                 </div>
               </div>
-
-              <div class="form-group" style="margin-top: 1.5rem;">
-                <label class="form-label">Orario indicativo Sveglia - Sonno</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                  <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted);">Sveglia</label>
-                    <input type="time" class="input-glass" id="wakeTimeInput" value="07:00">
-                  </div>
-                  <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted);">Vai a letto</label>
-                    <input type="time" class="input-glass" id="sleepTimeInput" value="23:00">
-                  </div>
-                </div>
-              </div>
-
-              <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); padding: 1rem; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
-                <span>Finestra totale di Veglia disponibile:</span>
-                <strong id="step1AwakeCalc" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--accent-cyan);">16.0 Ore / Giorno</strong>
-              </div>
-
               <div class="wizard-actions">
                 <div></div>
-                <button class="btn-glass btn-primary" id="btnStep1Next">
-                  Continua al Passo 2 <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                <button class="btn-glass btn-primary" id="btnStep1Next">Avanti <i class="fa-solid fa-arrow-right"></i></button>
               </div>
             </div>
           </div>
 
-          <!-- STEP 2: ESSENTIAL LOCKED HOURS -->
+          <!-- STEP 2: LOCKED HOURS -->
           <div class="wizard-step-content" id="wizardStep2">
             <div class="glass-card">
               <div class="card-header">
-                <div>
-                  <h3 class="card-title">Passo 2: Impegni Improrogabili Bloccati</h3>
-                  <p class="card-subtitle">Inserisci le ore dedicate a lavoro, studio, spostamenti e faccende domestiche.</p>
-                </div>
+                <h3 class="card-title">Passo 2: Impegni Bloccati</h3>
                 <span class="badge badge-amber">Tempo Bloccato</span>
               </div>
-
               <div class="form-group">
-                <label class="form-label">Lavoro / Studio Principale</label>
+                <label class="form-label">Lavoro / Studio</label>
                 <div class="range-container">
-                  <div class="range-val-display">
-                    <span>Durata giornaliera:</span>
-                    <span id="workHoursVal">8.0 Ore</span>
-                  </div>
+                  <div class="range-val-display"><span>Lavoro:</span><span id="workHoursVal">8.0 Ore</span></div>
                   <input type="range" class="input-range" id="workHoursInput" min="0" max="12" step="0.5" value="8">
                 </div>
               </div>
-
               <div class="form-group">
-                <label class="form-label">Spostamenti / Commute</label>
+                <label class="form-label">Spostamenti / Casa / Pasti</label>
                 <div class="range-container">
-                  <div class="range-val-display">
-                    <span>Tragitti al giorno:</span>
-                    <span id="commuteHoursVal">1.0 Ore</span>
-                  </div>
-                  <input type="range" class="input-range" id="commuteHoursInput" min="0" max="4" step="0.5" value="1">
+                  <div class="range-val-display"><span>Faccende e Spostamenti:</span><span id="choresHoursVal">3.5 Ore</span></div>
+                  <input type="range" class="input-range" id="choresHoursInput" min="0.5" max="6" step="0.5" value="3.5">
                 </div>
               </div>
-
-              <div class="form-group">
-                <label class="form-label">Faccende Domestiche, Pasti & Cura Personale</label>
-                <div class="range-container">
-                  <div class="range-val-display">
-                    <span>Tempo totale necessario:</span>
-                    <span id="choresHoursVal">2.5 Ore</span>
-                  </div>
-                  <input type="range" class="input-range" id="choresHoursInput" min="0.5" max="5" step="0.5" value="2.5">
-                </div>
-              </div>
-
-              <div style="background: rgba(255, 183, 3, 0.08); border: 1px solid rgba(255, 183, 3, 0.2); padding: 1rem; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
-                <span>Tempo Grezzo Rimanente per il tuo giorno:</span>
-                <strong id="step2RawCalc" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--accent-amber);">4.5 Ore / Giorno</strong>
-              </div>
-
               <div class="wizard-actions">
-                <button class="btn-glass" id="btnStep2Prev">
-                  <i class="fa-solid fa-arrow-left"></i> Indietro
-                </button>
-                <button class="btn-glass btn-primary" id="btnStep2Next">
-                  Continua al Passo 3 <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                <button class="btn-glass" id="btnStep2Prev"><i class="fa-solid fa-arrow-left"></i> Indietro</button>
+                <button class="btn-glass btn-primary" id="btnStep2Next">Avanti <i class="fa-solid fa-arrow-right"></i></button>
               </div>
             </div>
           </div>
 
-          <!-- STEP 3: SOCIAL MEDIA AUDIT & DETOX -->
+          <!-- STEP 3: SOCIAL DETOX -->
           <div class="wizard-step-content" id="wizardStep3">
             <div class="glass-card">
               <div class="card-header">
-                <div>
-                  <h3 class="card-title">Passo 3: Audit Social Media & Distrazioni</h3>
-                  <p class="card-subtitle">Scopri quanto tempo ti sottraggono lo scroll passivo sui social network ed elimina le distrazioni.</p>
-                </div>
-                <span class="badge badge-pink">Audit Distrazioni</span>
+                <h3 class="card-title">Passo 3: Taglio Social Media</h3>
+                <span class="badge badge-pink">Detox</span>
               </div>
-
               <div class="form-group">
-                <label class="form-label">Tempo Attuale speso sui Social (Instagram, TikTok, Reels, etc.)</label>
-                <p class="form-hint">Controlla lo 'Tempo sullo Schermo' del tuo smartphone se vuoi la cifra esatta!</p>
+                <label class="form-label">Tempo Speso sui Social (Ore/giorno)</label>
                 <div class="range-container">
-                  <div class="range-val-display">
-                    <span>Tempo Social Stimato:</span>
-                    <span id="socialWasteVal" style="color: var(--accent-pink);">3.0 Ore/giorno</span>
-                  </div>
-                  <input type="range" class="input-range" id="socialWasteInput" min="0.5" max="7" step="0.5" value="3" style="accent-color: var(--accent-pink);">
+                  <div class="range-val-display"><span>Stima Social:</span><span id="socialWasteVal" style="color: var(--accent-pink);">3.0 Ore</span></div>
+                  <input type="range" class="input-range" id="socialWasteInput" min="0.5" max="7" step="0.5" value="3">
                 </div>
               </div>
-
-              <div class="form-group" style="margin-top: 1.5rem;">
-                <label class="form-label">Obiettivo di Riduzione / Recupero Tempo</label>
-                <p class="form-hint">Scegli la percentuale di tempo che vuoi eliminare dai social e riconquistare per la tua vita reale.</p>
+              <div class="form-group">
+                <label class="form-label">Obiettivo di Riduzione</label>
                 <div class="options-grid">
                   <div class="option-card selected" data-detox-percent="0.7">
-                    <div class="option-icon" style="background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));">
-                      <i class="fa-solid fa-scissors"></i>
-                    </div>
-                    <div class="option-info">
-                      <h4>Taglio 70% (Consigliato)</h4>
-                      <p>Riconquisti la quasi totalità del tempo libero senza eliminare del tutto l'uso essenziale.</p>
-                    </div>
+                    <div class="option-icon" style="background: var(--accent-pink);"><i class="fa-solid fa-scissors"></i></div>
+                    <h4>Taglio 70%</h4>
                   </div>
-
                   <div class="option-card" data-detox-percent="0.5">
-                    <div class="option-icon" style="background: linear-gradient(135deg, var(--accent-amber), var(--accent-pink));">
-                      <i class="fa-solid fa-sliders"></i>
-                    </div>
-                    <div class="option-info">
-                      <h4>Taglio 50% (Moderato)</h4>
-                      <p>Dimezzi il tempo perso per un passaggio graduale verso l'uso consapevole.</p>
-                    </div>
+                    <div class="option-icon" style="background: var(--accent-amber);"><i class="fa-solid fa-sliders"></i></div>
+                    <h4>Taglio 50%</h4>
                   </div>
-
                   <div class="option-card" data-detox-percent="1.0">
-                    <div class="option-icon" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald));">
-                      <i class="fa-solid fa-ban"></i>
-                    </div>
-                    <div class="option-info">
-                      <h4>Detox Totale 100%</h4>
-                      <p>Elimini completamente il tempo social passivo per la massima riconquista.</p>
-                    </div>
+                    <div class="option-icon" style="background: var(--accent-cyan);"><i class="fa-solid fa-ban"></i></div>
+                    <h4>Taglio 100%</h4>
                   </div>
                 </div>
               </div>
-
-              <div style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.3); padding: 1.25rem; border-radius: var(--radius-md); margin-top: 1.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>Tempo Riconquistato dai Social ogni giorno:</span>
-                  <strong id="step3ReclaimedCalc" style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--accent-pink);">+2.1 Ore Riconquistate!</strong>
-                </div>
-              </div>
-
               <div class="wizard-actions">
-                <button class="btn-glass" id="btnStep3Prev">
-                  <i class="fa-solid fa-arrow-left"></i> Indietro
-                </button>
-                <button class="btn-glass btn-primary" id="btnStep3Next">
-                  Continua al Passo 4 <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                <button class="btn-glass" id="btnStep3Prev"><i class="fa-solid fa-arrow-left"></i> Indietro</button>
+                <button class="btn-glass btn-primary" id="btnStep3Next">Avanti <i class="fa-solid fa-arrow-right"></i></button>
               </div>
             </div>
           </div>
 
-          <!-- STEP 4: INTENTIONAL TIME ALLOCATION -->
+          <!-- STEP 4: INTENTIONAL ALLOCATION (SIMPLIFIED & PREDICTABLE) -->
           <div class="wizard-step-content" id="wizardStep4">
             <div class="glass-card">
               <div class="card-header">
-                <div>
-                  <h3 class="card-title">Passo 4: Allocazione del Tempo Riconquistato</h3>
-                  <p class="card-subtitle">Assegna le ore recuperate alle attività che ti arricchiscono, comprese svago, cinema, studio e sano riposo.</p>
-                </div>
-                <span class="badge badge-emerald">Budget Finale</span>
+                <h3 class="card-title">Passo 4: Assegna il tuo Tempo Libero</h3>
+                <span class="badge badge-emerald">Allocazione</span>
               </div>
 
-              <div style="background: rgba(0, 245, 212, 0.08); border: 1px solid rgba(0, 245, 212, 0.25); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                <span>Budget di Tempo Intenzionale Totale:</span>
-                <strong id="step4TotalBudget" style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--accent-emerald);">6.6 Ore / Giorno</strong>
+              <div style="background: rgba(0, 245, 212, 0.1); border: 1px solid rgba(0, 245, 212, 0.3); padding: 0.85rem 1.15rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>Tempo Libero Totale da Allocare:</span>
+                <strong id="step4TotalBudget" style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--accent-emerald);">4.5 Ore</strong>
               </div>
 
-              <!-- Allocation Sliders per Category -->
-              <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-                
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
                 <div class="form-group">
-                  <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-graduation-cap" style="color: var(--accent-cyan);"></i>
-                    Apprendimento & Crescita Personale (Lettura, Corsi, Lingue)
-                  </label>
+                  <label class="form-label"><i class="fa-solid fa-graduation-cap" style="color: var(--accent-cyan);"></i> Studio & Crescita</label>
                   <div class="range-container">
-                    <div class="range-val-display">
-                      <span style="font-size: 0.9rem; color: var(--text-muted);">Tempo dedicato:</span>
-                      <span id="allocProductiveVal">1.5 Ore</span>
-                    </div>
-                    <input type="range" class="input-range alloc-range" id="allocProductiveInput" min="0" max="4" step="0.25" value="1.5">
+                    <div class="range-val-display"><span id="allocProductiveVal">1.5 Ore</span></div>
+                    <input type="range" class="input-range alloc-range" id="allocProductiveInput" min="0" max="5" step="0.5" value="1.5">
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-dumbbell" style="color: var(--accent-emerald);"></i>
-                    Sport & Salute Fisica (Workout, Corsa, Yoga)
-                  </label>
+                  <label class="form-label"><i class="fa-solid fa-dumbbell" style="color: var(--accent-emerald);"></i> Sport & Salute</label>
                   <div class="range-container">
-                    <div class="range-val-display">
-                      <span style="font-size: 0.9rem; color: var(--text-muted);">Tempo dedicato:</span>
-                      <span id="allocFitnessVal">1.0 Ore</span>
-                    </div>
-                    <input type="range" class="input-range alloc-range" id="allocFitnessInput" min="0" max="3" step="0.25" value="1">
+                    <div class="range-val-display"><span id="allocFitnessVal">1.0 Ore</span></div>
+                    <input type="range" class="input-range alloc-range" id="allocFitnessInput" min="0" max="4" step="0.5" value="1.0">
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-film" style="color: var(--accent-purple);"></i>
-                    Cinema, Serie TV & Spettacolo
-                  </label>
+                  <label class="form-label"><i class="fa-solid fa-film" style="color: var(--accent-purple);"></i> Cinema & Svago</label>
                   <div class="range-container">
-                    <div class="range-val-display">
-                      <span style="font-size: 0.9rem; color: var(--text-muted);">Tempo dedicato:</span>
-                      <span id="allocCinemaVal">1.5 Ore</span>
-                    </div>
-                    <input type="range" class="input-range alloc-range" id="allocCinemaInput" min="0" max="4" step="0.25" value="1.5">
+                    <div class="range-val-display"><span id="allocCinemaVal">1.0 Ore</span></div>
+                    <input type="range" class="input-range alloc-range" id="allocCinemaInput" min="0" max="4" step="0.5" value="1.0">
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-users" style="color: var(--accent-amber);"></i>
-                    Relazioni & Connessioni Reali (Partner, Amici, Famiglia)
-                  </label>
+                  <label class="form-label"><i class="fa-solid fa-couch" style="color: #70e000;"></i> Relax & Noia Rigenerante</label>
                   <div class="range-container">
-                    <div class="range-val-display">
-                      <span style="font-size: 0.9rem; color: var(--text-muted);">Tempo dedicato:</span>
-                      <span id="allocRelationsVal">1.5 Ore</span>
-                    </div>
-                    <input type="range" class="input-range alloc-range" id="allocRelationsInput" min="0" max="5" step="0.25" value="1.5">
+                    <div class="range-val-display"><span id="allocBoredomVal">1.0 Ore</span></div>
+                    <input type="range" class="input-range alloc-range" id="allocBoredomInput" min="0" max="3" step="0.5" value="1.0">
                   </div>
                 </div>
-
-                <div class="form-group">
-                  <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-couch" style="color: #70e000;"></i>
-                    Sana Noia & Riposo Rigenerante (Mindfulness, Ozio Senza Sensi di Colpa)
-                  </label>
-                  <div class="range-container">
-                    <div class="range-val-display">
-                      <span style="font-size: 0.9rem; color: var(--text-muted);">Tempo dedicato:</span>
-                      <span id="allocBoredomVal">1.0 Ore</span>
-                    </div>
-                    <input type="range" class="input-range alloc-range" id="allocBoredomInput" min="0" max="3" step="0.25" value="1">
-                  </div>
-                </div>
-
               </div>
 
               <div class="wizard-actions">
-                <button class="btn-glass" id="btnStep4Prev">
-                  <i class="fa-solid fa-arrow-left"></i> Indietro
-                </button>
-                <button class="btn-glass btn-primary" id="btnFinishWizard">
-                  <i class="fa-solid fa-check"></i> Salva & Attiva Routine
-                </button>
+                <button class="btn-glass" id="btnStep4Prev"><i class="fa-solid fa-arrow-left"></i> Indietro</button>
+                <button class="btn-glass btn-primary" id="btnFinishWizard"><i class="fa-solid fa-check"></i> Salva Routine</button>
               </div>
             </div>
           </div>
@@ -673,292 +381,126 @@
       </section>
 
       <!-- ==========================================
-           VIEW 3: SOCIAL DETOX & LIFE AUDIT
-           ========================================== -->
-      <section id="view-detox" class="view-section">
-        <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
-          
-          <div class="glass-card">
-            <div class="card-header">
-              <div>
-                <h2 class="card-title">
-                  <i class="fa-solid fa-mobile-screen-button" style="color: var(--accent-pink);"></i>
-                  Audit Immersivo del Tempo Social Perso
-                </h2>
-                <p class="card-subtitle">Analizza l'impatto a lungo termine dello scroll passivo sulla tua vita e sulle tue relazioni</p>
-              </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
-              <div style="background: rgba(0, 0, 0, 0.3); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
-                <h4 style="color: var(--accent-pink); font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 0.5rem;">
-                  <i class="fa-solid fa-calendar-minus"></i> Proiezione Tempo Perso
-                </h4>
-                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9rem;">
-                  <li style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--text-muted);">Al mese:</span>
-                    <strong id="detoxMonthHours" style="color: var(--text-main);">90 Ore</strong>
-                  </li>
-                  <li style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--text-muted);">All'anno:</span>
-                    <strong id="detoxYearHours" style="color: var(--accent-pink);">1,095 Ore (~45 Giorni)</strong>
-                  </li>
-                  <li style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--text-muted);">In 10 Anni:</span>
-                    <strong id="detoxDecadeHours" style="color: var(--accent-red);">1.2 Anni di Vita Continua</strong>
-                  </li>
-                </ul>
-              </div>
-
-              <div style="background: rgba(0, 0, 0, 0.3); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
-                <h4 style="color: var(--accent-emerald); font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 0.5rem;">
-                  <i class="fa-solid fa-seedling"></i> Cosa Puoi Riconquistare
-                </h4>
-                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9rem;">
-                  <li style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--text-muted);">Libri letti all'anno:</span>
-                    <strong id="detoxBooksYear" style="color: var(--accent-cyan);">~36 Libri</strong>
-                  </li>
-                  <li style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--text-muted);">Nuove competenze:</span>
-                    <strong id="detoxSkillsYear" style="color: var(--accent-emerald);">2 Lingue o Strumenti</strong>
-                  </li>
-                  <li style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--text-muted);">Uscite con Amici/Partner:</span>
-                    <strong id="detoxSocialYear" style="color: var(--accent-amber);">+150 Uscite Reali</strong>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div style="margin-top: 1.5rem; text-align: center;">
-              <button class="btn-glass btn-accent-pink" id="btnLaunchWizardFromDetox">
-                <i class="fa-solid fa-scissors"></i> Avvia la Riduzione Intenzionale del Tempo Social
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ==========================================
-           VIEW 4: INTENTIONAL TIME BANK
+           VIEW 3: TIME BANK (BANCA ATTIVITÀ)
            ========================================== -->
       <section id="view-bank" class="view-section">
-        <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
-          
+        <div style="max-width: 800px; margin: 0 auto;">
           <div class="glass-card">
             <div class="card-header">
               <div>
-                <h2 class="card-title">
-                  <i class="fa-solid fa-box-archive" style="color: var(--accent-emerald);"></i>
-                  Catalogo Attività & Banca del Tempo
-                </h2>
-                <p class="card-subtitle">Gestisci le attività tra cui scegliere per occupare il tuo tempo ricavato</p>
+                <h2 class="card-title"><i class="fa-solid fa-box-archive" style="color: var(--accent-emerald);"></i> Banca delle Attività</h2>
+                <p class="card-subtitle">Scegli le attività e aggiungile alla to-do list di oggi</p>
               </div>
-              <button class="btn-glass btn-primary btn-sm" id="btnOpenAddActivity">
-                <i class="fa-solid fa-plus"></i> Nuova Attività
-              </button>
+              <button class="btn-glass btn-primary btn-sm" id="btnOpenAddActivity"><i class="fa-solid fa-plus"></i> Nuova</button>
             </div>
 
             <div class="options-grid" id="customActivitiesGrid">
               <!-- Custom activities rendered via JS -->
             </div>
           </div>
-
         </div>
       </section>
 
     </main>
 
     <!-- ==========================================
-         VISIONE, NEED & VALUE PROPOSITION MODAL
-         ========================================== -->
-    <div class="modal-backdrop" id="visionModal">
-      <div class="modal-glass" style="max-width: 600px;">
-        <div class="modal-header">
-          <h3 class="modal-title" style="color: var(--accent-cyan);">
-            <i class="fa-solid fa-compass"></i> Visione & Manifesto di Prodotto
-          </h3>
-          <button class="btn-close-modal" id="btnCloseVisionModal">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-          <div style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.3); padding: 1rem; border-radius: var(--radius-md);">
-            <h4 style="color: var(--accent-pink); font-family: var(--font-heading); margin-bottom: 0.35rem;">
-              🔴 Need (Il Bisogno)
-            </h4>
-            <p style="font-size: 0.85rem; color: #e2e8f0;">
-              Lo scroll infinito sui social media ci isola dal mondo reale, ruba ore preziose ogni giorno e ci impedisce di coltivare le relazioni con amici, partner ed hobby che amiamo.
-            </p>
-          </div>
-
-          <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); padding: 1rem; border-radius: var(--radius-md);">
-            <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 0.35rem;">
-              🎯 Obiettivo del Progetto
-            </h4>
-            <p style="font-size: 0.85rem; color: #e2e8f0;">
-              Definire la propria routine a partire dalle ore di veglia/sonno e dagli impegni bloccati (lavoro, commute, casa), eliminare l'uso passivo dei social e riconquistare un "Budget di Tempo Intenzionale".
-            </p>
-          </div>
-
-          <div style="background: rgba(255, 183, 3, 0.1); border: 1px solid rgba(255, 183, 3, 0.3); padding: 1rem; border-radius: var(--radius-md);">
-            <h4 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 0.35rem;">
-              💎 Value Proposition
-            </h4>
-            <p style="font-size: 0.9rem; font-weight: 600; color: #fff; font-style: italic;">
-              "Riscopri il valore delle tue 24 ore: trasforma l'isolamento da scroll passivo sui social in tempo reale per la tua vita, le tue passioni e le tue relazioni."
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==========================================
-         AUTH MODAL (ACCEDI / REGISTRATI / RECUPERO PASSWORD)
+         AUTH MODAL (ACCEDI / REGISTRATI VIA SUPABASE)
          ========================================== -->
     <div class="modal-backdrop" id="authModal">
-      <div class="modal-glass" style="max-width: 480px;">
+      <div class="modal-glass">
         <div class="modal-header">
-          <h3 class="modal-title" id="authModalTitle">Accedi al tuo Account</h3>
-          <button class="btn-close-modal" id="btnCloseAuthModal">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          <h3 class="modal-title" id="authModalTitle">Accedi</h3>
+          <button class="btn-close-modal" id="btnCloseAuthModal"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- Auth Tabs Navigation -->
-        <div class="nav-tabs" style="width: 100%; margin-bottom: 1.25rem;">
-          <button class="nav-btn active" id="tabAuthLogin" style="flex: 1; justify-content: center;">Accedi</button>
-          <button class="nav-btn" id="tabAuthRegister" style="flex: 1; justify-content: center;">Registrati</button>
+        <div class="nav-tabs" style="margin-bottom: 1rem;">
+          <button class="nav-btn active" id="tabAuthLogin">Accedi</button>
+          <button class="nav-btn" id="tabAuthRegister">Registrati</button>
         </div>
 
-        <!-- Status Message Banner -->
-        <div id="authStatusBanner" style="display: none; padding: 0.85rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+        <div id="authStatusBanner" style="display: none; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1rem;"></div>
 
-        <!-- 1. FORM ACCEDI -->
+        <!-- FORM ACCEDI -->
         <form id="formLogin">
           <div class="form-group">
             <label class="form-label">Email</label>
             <input type="email" class="input-glass" id="loginEmail" placeholder="nome@esempio.com" required>
           </div>
-
           <div class="form-group">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between;">
               <label class="form-label">Password</label>
-              <a href="#" id="linkForgotPassword" style="font-size: 0.8rem; color: var(--accent-cyan); text-decoration: none;">Password dimenticata?</a>
+              <a href="#" id="linkForgotPassword" style="font-size: 0.75rem; color: var(--accent-cyan);">Recupera password</a>
             </div>
             <input type="password" class="input-glass" id="loginPassword" placeholder="••••••••" required>
           </div>
-
-          <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 1rem;">
-            <i class="fa-solid fa-right-to-bracket"></i> Accedi
-          </button>
+          <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 0.5rem;">Accedi</button>
         </form>
 
-        <!-- 2. FORM REGISTRATI -->
+        <!-- FORM REGISTRATI -->
         <form id="formRegister" style="display: none;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
             <div class="form-group">
               <label class="form-label">Nome</label>
-              <input type="text" class="input-glass" id="regFirstName" placeholder="es. Alessandro" required>
+              <input type="text" class="input-glass" id="regFirstName" placeholder="Nome" required>
             </div>
             <div class="form-group">
               <label class="form-label">Cognome</label>
-              <input type="text" class="input-glass" id="regLastName" placeholder="es. Foti" required>
+              <input type="text" class="input-glass" id="regLastName" placeholder="Cognome" required>
             </div>
           </div>
-
           <div class="form-group">
             <label class="form-label">Email</label>
             <input type="email" class="input-glass" id="regEmail" placeholder="nome@esempio.com" required>
           </div>
-
           <div class="form-group">
             <label class="form-label">Password</label>
             <input type="password" class="input-glass" id="regPassword" placeholder="Almeno 6 caratteri" minlength="6" required>
           </div>
-
-          <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 1rem;">
-            <i class="fa-solid fa-user-plus"></i> Crea Account
-          </button>
+          <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 0.5rem;">Crea Account</button>
         </form>
 
-        <!-- 3. FORM RECUPERO PASSWORD -->
+        <!-- FORM RECUPERO PASSWORD -->
         <form id="formForgotPassword" style="display: none;">
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-            Inserisci l'email associata al tuo account. Ti invieremo un'email alla tua casella di posta per reimpostare la password.
-          </p>
-
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Inserisci la tua email per ricevere il link di recupero password alla casella postale.</p>
           <div class="form-group">
             <label class="form-label">Email</label>
             <input type="email" class="input-glass" id="forgotEmail" placeholder="nome@esempio.com" required>
           </div>
-
-          <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
-            <button type="button" class="btn-glass" id="btnBackToLogin" style="flex: 1;">
-              <i class="fa-solid fa-arrow-left"></i> Torna ad Accedi
-            </button>
-            <button type="submit" class="btn-glass btn-accent-pink" style="flex: 1.5;">
-              <i class="fa-solid fa-paper-plane"></i> Invia Email Reset
-            </button>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button type="button" class="btn-glass" id="btnBackToLogin" style="flex: 1;">Indietro</button>
+            <button type="submit" class="btn-glass btn-accent-pink" style="flex: 1.5;">Invia Reset</button>
           </div>
         </form>
-
-        <!-- Supabase Keys Settings Accordion inside Modal -->
-        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-          <details style="font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">
-            <summary style="font-weight: 600; color: var(--accent-cyan);"><i class="fa-solid fa-key"></i> Configura Credenziali Supabase Project</summary>
-            <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
-              <input type="text" class="input-glass" id="sbUrlInput" placeholder="Supabase URL (es. https://xyz.supabase.co)">
-              <input type="password" class="input-glass" id="sbKeyInput" placeholder="Supabase Anon Key">
-              <button type="button" class="btn-glass btn-sm" id="btnSaveSbKeys" style="margin-top: 0.25rem;">Salva Credenziali Project</button>
-            </div>
-          </details>
-        </div>
-
       </div>
     </div>
 
-    <!-- ==========================================
-         ADD CUSTOM ACTIVITY MODAL
-         ========================================== -->
+    <!-- ADD CUSTOM ACTIVITY MODAL -->
     <div class="modal-backdrop" id="addActivityModal">
       <div class="modal-glass">
         <div class="modal-header">
-          <h3 class="modal-title">Aggiungi Attività Intenzionale</h3>
-          <button class="btn-close-modal" id="btnCloseAddActivityModal">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          <h3 class="modal-title">Nuova Attività</h3>
+          <button class="btn-close-modal" id="btnCloseAddActivityModal"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
         <form id="addActivityForm">
           <div class="form-group">
-            <label class="form-label">Nome Attività</label>
-            <input type="text" class="input-glass" id="newActTitle" placeholder="es. Corso di Chitarra, Cinema d'Essai" required>
+            <label class="form-label">Titolo</label>
+            <input type="text" class="input-glass" id="newActTitle" placeholder="es. Corso di Chitarra" required>
           </div>
-
           <div class="form-group">
             <label class="form-label">Categoria</label>
             <select class="input-glass" id="newActCategory">
-              <option value="productive">Apprendimento & Crescita</option>
-              <option value="fitness">Sport & Benessere</option>
-              <option value="cinema">Cinema & Spettacolo</option>
-              <option value="relations">Relazioni & Amici</option>
-              <option value="boredom">Sana Noia & Ozio</option>
+              <option value="productive">Studio & Crescita</option>
+              <option value="fitness">Sport & Salute</option>
+              <option value="cinema">Cinema & Svago</option>
+              <option value="boredom">Relax & Noia</option>
             </select>
           </div>
-
           <div class="form-group">
-            <label class="form-label">Durata Consigliata (Ore)</label>
-            <input type="number" class="input-glass" id="newActDuration" min="0.25" max="6" step="0.25" value="1.0" required>
+            <label class="form-label">Durata (Ore)</label>
+            <input type="number" class="input-glass" id="newActDuration" min="0.5" max="6" step="0.5" value="1.0" required>
           </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
-            <button type="submit" class="btn-glass btn-primary">
-              <i class="fa-solid fa-plus"></i> Aggiungi al Catalogo
-            </button>
+          <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+            <button type="submit" class="btn-glass btn-primary">Aggiungi</button>
           </div>
         </form>
       </div>
@@ -968,7 +510,7 @@
 
   <!-- Supabase Config Script -->
   <script src="js/supabase-config.js"></script>
-  <!-- App Main Logic Script -->
+  <!-- App Engine Script -->
   <script src="js/app.js"></script>
 </body>
 </html>
