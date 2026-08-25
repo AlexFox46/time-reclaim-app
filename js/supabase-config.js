@@ -1,14 +1,14 @@
 /**
- * TIME RECLAIM - SUPABASE CLOUD AUTH & LOCAL FALLBACK ENGINE
+ * TIME RECLAIM - SUPABASE CLOUD AUTH & SYNC ENGINE
  * Progetto Supabase: https://dqjugoaktxcyddadxxka.supabase.co
  */
 
 window.TimeReclaimSupabase = (function () {
   let supabaseClient = null;
 
-  // URL e Publishable / Anon Key ufficiali del progetto Supabase
+  // URL e JWT Anon Key del progetto Supabase dell'utente
   const SUPABASE_URL = localStorage.getItem('supabase_url') || 'https://dqjugoaktxcyddadxxka.supabase.co';
-  const SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key') || 'sb_publishable_4Zhb7h_1oc7h4kZLHUe4rA_aaqPha3N';
+  const SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxanVnb2FrdHhjeWRkYWR4eGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NDk0MDIsImV4cCI6MjEwMzIyNTQwMn0.3FH9ZZ-S6l4AxHifEHYa0rhDAXHYy7EluvWunm2I8Rk';
 
   function initClient() {
     if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
