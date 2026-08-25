@@ -2,8 +2,8 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TimeReclaim | Gestione Intenzionale delle 24 Ore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TimeReclaim | Native Mobile App</title>
   <meta name="description" content="Mappa la tua routine, elimina il tempo perso sui social media e riconquista le tue ore per quello che ami.">
   
   <!-- Google Fonts -->
@@ -32,36 +32,43 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <div class="app-container">
-    <!-- Navbar Header (Mobile First) -->
-    <header class="navbar">
-      <div class="navbar-top">
-        <a href="#" class="brand">
-          <div class="brand-logo"><i class="fa-solid fa-hourglass-half"></i></div>
-          <div class="brand-text">
-            <h1>TimeReclaim</h1>
-            <p>Own Your 24 Hours</p>
-          </div>
-        </a>
+    
+    <!-- TOP MOBILE HEADER -->
+    <header class="mobile-top-header">
+      <a href="#" class="brand">
+        <div class="brand-logo"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="brand-text">
+          <h1>TimeReclaim</h1>
+          <p>Own Your 24 Hours</p>
+        </div>
+      </a>
 
-        <button class="user-profile-btn" id="openAuthModal">
-          <div class="user-avatar" id="navAvatar">TR</div>
-          <span class="user-name" id="navUserName">Accedi</span>
-        </button>
-      </div>
-
-      <!-- Main Navigation Tabs (3 Clean Sections) -->
-      <nav class="nav-tabs">
-        <button class="nav-btn active" data-tab="dashboard">
-          <i class="fa-solid fa-chart-pie"></i> Dashboard
-        </button>
-        <button class="nav-btn" data-tab="wizard">
-          <i class="fa-solid fa-sliders"></i> Routine
-        </button>
-        <button class="nav-btn" data-tab="bank">
-          <i class="fa-solid fa-box-archive"></i> Banca Attività
-        </button>
-      </nav>
+      <!-- Quick Profile Button in Header -->
+      <button class="header-user-btn" id="headerAvatarBtn">
+        <div class="user-avatar" id="navAvatar">TR</div>
+        <span class="user-name" id="navUserName">Accedi</span>
+      </button>
     </header>
+
+    <!-- FIXED MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav">
+      <button class="nav-item active" data-tab="dashboard">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-tab="wizard">
+        <i class="fa-solid fa-sliders"></i>
+        <span>Routine</span>
+      </button>
+      <button class="nav-item" data-tab="bank">
+        <i class="fa-solid fa-box-archive"></i>
+        <span>Banca</span>
+      </button>
+      <button class="nav-item" data-tab="profile">
+        <i class="fa-solid fa-user"></i>
+        <span>Profilo</span>
+      </button>
+    </nav>
 
     <!-- MAIN VIEWS CONTAINER -->
     <main>
@@ -100,13 +107,13 @@
 
         <!-- 24h Timeline Widget with Clear Legend -->
         <div class="glass-card">
-          <div class="card-header" style="margin-bottom: 0.5rem;">
+          <div class="card-header" style="margin-bottom: 0.4rem;">
             <div>
               <h2 class="card-title">
                 <i class="fa-solid fa-timeline" style="color: var(--accent-cyan);"></i>
                 Mappa delle 24 Ore Oggi
               </h2>
-              <p class="card-subtitle">Identifica visivamente le fasce orarie in cui sei più libero</p>
+              <p class="card-subtitle">Fasce orarie libere evidenziate</p>
             </div>
           </div>
 
@@ -118,20 +125,20 @@
           <!-- Timeline Color Legend -->
           <div class="timeline-legend">
             <div class="legend-item">
-              <div class="legend-color-dot" style="background: rgba(142, 45, 226, 0.7);"></div>
+              <div class="legend-color-dot" style="background: rgba(142, 45, 226, 0.75);"></div>
               <span>🌙 Sonno (00-07)</span>
             </div>
             <div class="legend-item">
-              <div class="legend-color-dot" style="background: rgba(59, 130, 246, 0.7);"></div>
-              <span>💼 Lavoro/Impegni (08-17)</span>
+              <div class="legend-color-dot" style="background: rgba(59, 130, 246, 0.75);"></div>
+              <span>💼 Lavoro (08-17)</span>
             </div>
             <div class="legend-item">
-              <div class="legend-color-dot" style="background: rgba(255, 0, 127, 0.8);"></div>
-              <span>📱 Social Residui (17-18)</span>
+              <div class="legend-color-dot" style="background: rgba(255, 0, 127, 0.85);"></div>
+              <span>📱 Social (17-18)</span>
             </div>
             <div class="legend-item">
               <div class="legend-color-dot" style="background: var(--accent-cyan);"></div>
-              <span>✨ Tempo Libero Intenzionale (18-23)</span>
+              <span>✨ Libero (18-23)</span>
             </div>
           </div>
         </div>
@@ -147,7 +154,7 @@
                     <i class="fa-solid fa-chart-pie" style="color: var(--accent-cyan);"></i>
                     Ripartizione delle 24h
                   </h3>
-                  <p class="card-subtitle">Visualizzazione sintetica della tua giornata</p>
+                  <p class="card-subtitle">Visualizzazione sintetica</p>
                 </div>
                 <button class="btn-glass btn-sm" id="btnEditRoutine">Modifica</button>
               </div>
@@ -172,7 +179,7 @@
             <!-- Harmony Balance Bar -->
             <div class="glass-card">
               <div class="card-header">
-                <h3 class="card-title"><i class="fa-solid fa-scale-balanced" style="color: var(--accent-amber);"></i> Bilanciamento Vita & Relax</h3>
+                <h3 class="card-title"><i class="fa-solid fa-scale-balanced" style="color: var(--accent-amber);"></i> Bilanciamento Vita</h3>
                 <span class="badge badge-emerald" id="harmonyStatusBadge">Bilanciato</span>
               </div>
               <div class="harmony-bar-container" id="harmonyBar"></div>
@@ -195,7 +202,7 @@
               <div class="card-header">
                 <h3 class="card-title" style="color: #fff;"><i class="fa-solid fa-fire" style="color: var(--accent-pink);"></i> Impatto Anti-Social</h3>
               </div>
-              <p style="font-size: 0.8rem; color: #e2e8f0;">Ore riconquistate dallo scroll passivo:</p>
+              <p style="font-size: 0.75rem; color: #e2e8f0;">Ore riconquistate dallo scroll passivo:</p>
               <div class="detox-metrics-grid">
                 <div class="detox-metric-box">
                   <h6>Settimanali</h6>
@@ -214,16 +221,16 @@
       </section>
 
       <!-- ==========================================
-           VIEW 2: ROUTINE SETUP WIZARD (STEP BY STEP)
+           VIEW 2: ROUTINE SETUP WIZARD
            ========================================== -->
       <section id="view-wizard" class="view-section">
         <div class="wizard-container">
           
-          <div class="glass-card" style="margin-bottom: 1rem;">
+          <div class="glass-card" style="margin-bottom: 0.85rem;">
             <div class="card-header" style="margin-bottom: 0;">
               <div>
-                <h2 class="card-title"><i class="fa-solid fa-sliders" style="color: var(--accent-cyan);"></i> Configura la tua Routine</h2>
-                <p class="card-subtitle">Mappa le tue 24 ore in 4 semplici passaggi</p>
+                <h2 class="card-title"><i class="fa-solid fa-sliders" style="color: var(--accent-cyan);"></i> Configura Routine</h2>
+                <p class="card-subtitle">Mappa le tue 24 ore in 4 passaggi</p>
               </div>
             </div>
           </div>
@@ -323,20 +330,20 @@
             </div>
           </div>
 
-          <!-- STEP 4: INTENTIONAL ALLOCATION (SIMPLIFIED & PREDICTABLE) -->
+          <!-- STEP 4: INTENTIONAL ALLOCATION -->
           <div class="wizard-step-content" id="wizardStep4">
             <div class="glass-card">
               <div class="card-header">
-                <h3 class="card-title">Passo 4: Assegna il tuo Tempo Libero</h3>
+                <h3 class="card-title">Passo 4: Assegna Tempo Libero</h3>
                 <span class="badge badge-emerald">Allocazione</span>
               </div>
 
-              <div style="background: rgba(0, 245, 212, 0.1); border: 1px solid rgba(0, 245, 212, 0.3); padding: 0.85rem 1.15rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
-                <span>Tempo Libero Totale da Allocare:</span>
-                <strong id="step4TotalBudget" style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--accent-emerald);">4.5 Ore</strong>
+              <div style="background: rgba(0, 245, 212, 0.1); border: 1px solid rgba(0, 245, 212, 0.3); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>Tempo Libero Totale:</span>
+                <strong id="step4TotalBudget" style="font-family: var(--font-heading); font-size: 1.15rem; color: var(--accent-emerald);">4.5 Ore</strong>
               </div>
 
-              <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; flex-direction: column; gap: 0.85rem;">
                 <div class="form-group">
                   <label class="form-label"><i class="fa-solid fa-graduation-cap" style="color: var(--accent-cyan);"></i> Studio & Crescita</label>
                   <div class="range-container">
@@ -381,15 +388,15 @@
       </section>
 
       <!-- ==========================================
-           VIEW 3: TIME BANK (BANCA ATTIVITÀ)
+           VIEW 3: TIME BANK
            ========================================== -->
       <section id="view-bank" class="view-section">
-        <div style="max-width: 800px; margin: 0 auto;">
+        <div style="max-width: 750px; margin: 0 auto;">
           <div class="glass-card">
             <div class="card-header">
               <div>
                 <h2 class="card-title"><i class="fa-solid fa-box-archive" style="color: var(--accent-emerald);"></i> Banca delle Attività</h2>
-                <p class="card-subtitle">Scegli le attività e aggiungile alla to-do list di oggi</p>
+                <p class="card-subtitle">Scegli le attività e aggiungile a oggi</p>
               </div>
               <button class="btn-glass btn-primary btn-sm" id="btnOpenAddActivity"><i class="fa-solid fa-plus"></i> Nuova</button>
             </div>
@@ -401,11 +408,87 @@
         </div>
       </section>
 
+      <!-- ==========================================
+           VIEW 4: SCHERMATA PROFILO UTENTE (NEW)
+           ========================================== -->
+      <section id="view-profile" class="view-section">
+        <div style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+          
+          <!-- Profile Main Card -->
+          <div class="glass-card profile-card">
+            <div class="profile-avatar-large" id="profileAvatarLarge">AF</div>
+            <h2 class="profile-name" id="profileName">Alessandro Foti</h2>
+            <p class="profile-email" id="profileEmail">alessandro@esempio.com</p>
+
+            <div class="profile-badge" id="profileStatusBadge">
+              <i class="fa-solid fa-cloud-check"></i> Supabase Cloud Synchronized
+            </div>
+
+            <div class="motivation-box">
+              <label class="form-label" style="font-size: 0.75rem; color: var(--accent-cyan);">IL TUO OBIETTIVO E MOTIVAZIONE</label>
+              <textarea class="input-glass" id="profileMotivationInput" rows="2" style="min-height: 60px; font-size: 0.85rem; resize: none;" placeholder="Inserisci la tua motivazione personale..."></textarea>
+              <button class="btn-glass btn-sm" id="btnSaveMotivation" style="margin-top: 0.5rem; width: 100%;">
+                <i class="fa-solid fa-floppy-disk"></i> Salva Motivazione
+              </button>
+            </div>
+          </div>
+
+          <!-- Profile Stats Summary Card -->
+          <div class="glass-card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-chart-line" style="color: var(--accent-cyan);"></i> Le tue Metriche di Routine</h3>
+            </div>
+
+            <div class="stats-cards-row">
+              <div class="stat-card">
+                <div class="stat-icon" style="background: var(--accent-cyan);"><i class="fa-solid fa-bolt"></i></div>
+                <div class="stat-info">
+                  <h3 id="profileAwake">16.0h</h3>
+                  <p>Veglia</p>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon" style="background: var(--accent-pink);"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="stat-info">
+                  <h3 id="profileReclaimed">2.5h</h3>
+                  <p>Salvate</p>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon" style="background: var(--accent-amber);"><i class="fa-solid fa-heart"></i></div>
+                <div class="stat-info">
+                  <h3 id="profileScore">85%</h3>
+                  <p>Score Vita</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Actions Card -->
+          <div class="glass-card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-gear" style="color: var(--text-muted);"></i> Gestione Account</h3>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+              <button class="btn-glass" id="btnOpenAuthFromProfile" style="width: 100%; justify-content: space-between;">
+                <span><i class="fa-solid fa-user-gear"></i> Accedi / Registrati</span>
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+
+              <button class="btn-glass btn-danger" id="btnLogout" style="width: 100%; justify-content: space-between;">
+                <span><i class="fa-solid fa-right-from-bracket"></i> Esci dall'Account</span>
+                <i class="fa-solid fa-power-off"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
     </main>
 
-    <!-- ==========================================
-         AUTH MODAL (ACCEDI / REGISTRATI VIA SUPABASE)
-         ========================================== -->
+    <!-- AUTH MODAL -->
     <div class="modal-backdrop" id="authModal">
       <div class="modal-glass">
         <div class="modal-header">
@@ -420,7 +503,6 @@
 
         <div id="authStatusBanner" style="display: none; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1rem;"></div>
 
-        <!-- FORM ACCEDI -->
         <form id="formLogin">
           <div class="form-group">
             <label class="form-label">Email</label>
@@ -436,7 +518,6 @@
           <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 0.5rem;">Accedi</button>
         </form>
 
-        <!-- FORM REGISTRATI -->
         <form id="formRegister" style="display: none;">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
             <div class="form-group">
@@ -459,16 +540,15 @@
           <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 0.5rem;">Crea Account</button>
         </form>
 
-        <!-- FORM RECUPERO PASSWORD -->
         <form id="formForgotPassword" style="display: none;">
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Inserisci la tua email per ricevere il link di recupero password alla casella postale.</p>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Inserisci la tua email per ricevere il link di recupero password.</p>
           <div class="form-group">
             <label class="form-label">Email</label>
             <input type="email" class="input-glass" id="forgotEmail" placeholder="nome@esempio.com" required>
           </div>
           <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
             <button type="button" class="btn-glass" id="btnBackToLogin" style="flex: 1;">Indietro</button>
-            <button type="submit" class="btn-glass btn-accent-pink" style="flex: 1.5;">Invia Reset</button>
+            <button type="submit" class="btn-glass btn-danger" style="flex: 1.5;">Invia Reset</button>
           </div>
         </form>
       </div>

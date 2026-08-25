@@ -1,6 +1,6 @@
 /**
- * TIME RECLAIM & ROUTINE MAXIMIZER - CORE ENGINE
- * Estetica Mobile-First Liquid Glass & Supabase Auth Integration
+ * TIME RECLAIM & ROUTINE MAXIMIZER - NATIVE MOBILE APP ENGINE
+ * Estetica Mobile App (PWA feel) con Bottom Navbar e Schermata Profilo
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
       id: null,
       firstName: 'Alessandro',
       lastName: 'Foti',
-      email: '',
-      avatar: 'TR',
-      motivation: ''
+      email: 'alessandro@esempio.com',
+      avatar: 'AF',
+      motivation: 'Eliminare lo scroll compulsivo sui social media e coltivare le mie relazioni personali'
     },
     routine: {
       sleepHours: 8.0,
@@ -96,11 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const awakeHours = 24.0 - r.sleepHours;
     const lockedHours = r.workHours + r.choresHours;
     
-    // Social waste & detox calculation
     const reclaimedSocialHours = r.socialWasteHours * r.detoxPercent;
     const socialWasteResidue = r.socialWasteHours * (1 - r.detoxPercent);
 
-    // Total raw available time
     const totalIntentionalBudget = Math.max(0, awakeHours - lockedHours - socialWasteResidue);
 
     const totalAllocated = a.productive + a.fitness + a.cinema + a.boredom;
@@ -121,12 +119,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 4. TAB NAVIGATION SYSTEM
+  // 4. MOBILE BOTTOM NAVBAR NAVIGATION SYSTEM
   // ==========================================================================
-  const navBtns = document.querySelectorAll('.nav-btn');
+  const navItems = document.querySelectorAll('.nav-item');
   const viewSections = document.querySelectorAll('.view-section');
 
-  navBtns.forEach(btn => {
+  navItems.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetTab = btn.dataset.tab;
       switchTab(targetTab);
@@ -134,10 +132,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function switchTab(tabId) {
-    navBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+    navItems.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
     viewSections.forEach(sec => sec.classList.toggle('active', sec.id === `view-${tabId}`));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // Header Avatar button opens profile tab directly
+  document.getElementById('headerAvatarBtn')?.addEventListener('click', () => {
+    switchTab('profile');
+  });
 
   // ==========================================================================
   // 5. WIZARD STEP NAVIGATION & SLIDERS
@@ -229,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Step 4 Allocations Sliders (Simplified & Predictable)
+  // Step 4 Allocations Sliders
   const allocInputs = {
     productive: document.getElementById('allocProductiveInput'),
     fitness: document.getElementById('allocFitnessInput'),
@@ -386,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 9. TIME BANK & CUSTOM ACTIVITIES (FIXED CTA & TOAST NO JUMP)
+  // 9. TIME BANK & CUSTOM ACTIVITIES
   // ==========================================================================
   function renderCustomActivities() {
     const grid = document.getElementById('customActivitiesGrid');
@@ -408,7 +411,6 @@ document.addEventListener('DOMContentLoaded', () => {
     `).join('');
   }
 
-  // Add activity without jumping tab or page
   window.addActivityToToday = function(title, duration, category) {
     state.checklist.push({
       id: Date.now().toString(),
@@ -457,10 +459,75 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 10. AUTHENTICATION & MODAL CONTROLLERS (SUPABASE BOUND A MONTE)
+  // 10. USER PROFILE SCREEN RENDERER
+  // ==========================================================================
+  function renderUserProfile() {
+    const metrics = calculateMetrics();
+
+    const profileAvatarLarge = document.getElementById('profileAvatarLarge');
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const profileStatusBadge = document.getElementById('profileStatusBadge');
+    const profileMotivationInput = document.getElementById('profileMotivationInput');
+
+    if (profileAvatarLarge) profileAvatarLarge.textContent = state.user.avatar || 'AF';
+    if (profileName) profileName.textContent = state.user.firstName ? `${state.user.firstName} ${state.user.lastName}` : 'Ospite';
+    if (profileEmail) profileEmail.textContent = state.user.email || 'Accedi per sincronizzare i dati';
+    
+    if (profileStatusBadge) {
+      if (state.user.id && !state.user.id.startsWith('local_')) {
+        profileStatusBadge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> Supabase Cloud Synchronized`;
+        profileStatusBadge.style.color = 'var(--accent-emerald)';
+      } else {
+        profileStatusBadge.innerHTML = `<i class="fa-solid fa-hard-drive"></i> Profilo Locale`;
+        profileStatusBadge.style.color = 'var(--accent-amber)';
+      }
+    }
+
+    if (profileMotivationInput && !profileMotivationInput.value) {
+      profileMotivationInput.value = state.user.motivation || '';
+    }
+
+    const profileAwake = document.getElementById('profileAwake');
+    if (profileAwake) profileAwake.textContent = `${metrics.awakeHours.toFixed(1)}h`;
+
+    const profileReclaimed = document.getElementById('profileReclaimed');
+    if (profileReclaimed) profileReclaimed.textContent = `${metrics.reclaimedSocialHours.toFixed(1)}h`;
+
+    const profileScore = document.getElementById('profileScore');
+    if (profileScore) profileScore.textContent = `${metrics.relationScore}%`;
+  }
+
+  // Save Motivation Button
+  document.getElementById('btnSaveMotivation')?.addEventListener('click', () => {
+    const input = document.getElementById('profileMotivationInput');
+    if (input) {
+      state.user.motivation = input.value.trim();
+      saveState();
+      showToast('Obiettivo e motivazione salvati!');
+    }
+  });
+
+  // Open Auth Modal from Profile
+  document.getElementById('btnOpenAuthFromProfile')?.addEventListener('click', () => {
+    authModal.classList.add('open');
+  });
+
+  // Logout Button
+  document.getElementById('btnLogout')?.addEventListener('click', async () => {
+    if (confirm('Sei sicuro di voler uscire dal tuo account?')) {
+      await window.TimeReclaimSupabase.signOutUser();
+      state.user = { id: null, firstName: '', lastName: '', email: '', avatar: 'TR', motivation: '' };
+      saveState();
+      showToast('Logout effettuato');
+      switchTab('dashboard');
+    }
+  });
+
+  // ==========================================================================
+  // 11. AUTHENTICATION & MODAL CONTROLLERS
   // ==========================================================================
   const authModal = document.getElementById('authModal');
-  const openAuthModal = document.getElementById('openAuthModal');
   const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
   const authModalTitle = document.getElementById('authModalTitle');
   const authStatusBanner = document.getElementById('authStatusBanner');
@@ -485,11 +552,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function hideAuthStatus() {
     if (authStatusBanner) authStatusBanner.style.display = 'none';
   }
-
-  openAuthModal?.addEventListener('click', () => {
-    hideAuthStatus();
-    authModal.classList.add('open');
-  });
 
   btnCloseAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
 
@@ -626,14 +688,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================================================
-  // 11. GLOBAL RENDER ALL FUNCTION
+  // 12. GLOBAL RENDER ALL FUNCTION
   // ==========================================================================
   function renderAll() {
     const r = state.routine;
 
     const navAvatar = document.getElementById('navAvatar');
     const navUserName = document.getElementById('navUserName');
-    if (navAvatar) navAvatar.textContent = state.user.avatar || 'TR';
+    if (navAvatar) navAvatar.textContent = state.user.avatar || 'AF';
     if (navUserName) navUserName.textContent = state.user.firstName ? `${state.user.firstName}` : 'Accedi';
 
     const metrics = calculateMetrics();
@@ -675,6 +737,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDetoxShowcase();
     renderCustomActivities();
     renderHourlyTimeline('dashboardHourlyGrid');
+    renderUserProfile();
   }
 
   // Initial Boot Render
