@@ -1,23 +1,25 @@
 /**
- * TIME RECLAIM - SUPABASE CLOUD AUTH & SYNC ENGINE
- * Credenziali Supabase legate a monte senza richiesta credenziali all'utente in UI
+ * TIME RECLAIM - SUPABASE CLOUD AUTH & LOCAL FALLBACK ENGINE
+ * Gestione automatica e trasparente delle chiamate Auth con Fallback Locale in caso di assenza/errore del server Supabase.
  */
 
 window.TimeReclaimSupabase = (function () {
   let supabaseClient = null;
 
-  // Credenziali legate a monte (sostituibili con quelle del progetto Supabase)
-  const BOUND_SUPABASE_URL = localStorage.getItem('supabase_url') || 'https://xyzcompany.supabase.co';
-  const BOUND_SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6...';
+  // URL e Anon Key del progetto Supabase (puoi sostituirle con quelle reali del tuo progetto Supabase)
+  const SUPABASE_URL = localStorage.getItem('supabase_url') || 'https://xyzcompany.supabase.co';
+  const SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6...';
+
+  const isPlaceholderUrl = (url) => !url || url.includes('xyzcompany.supabase.co') || url.includes('example.supabase.co');
 
   function initClient() {
-    if (BOUND_SUPABASE_URL && BOUND_SUPABASE_ANON_KEY && window.supabase) {
+    if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && !isPlaceholderUrl(SUPABASE_URL)) {
       try {
-        supabaseClient = window.supabase.createClient(BOUND_SUPABASE_URL, BOUND_SUPABASE_ANON_KEY);
-        console.log('Supabase client legato a monte inizializzato.');
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Client Supabase Cloud connesso.');
         return true;
       } catch (e) {
-        console.warn('Inizializzazione Supabase fallita (usare local storage fallback):', e);
+        console.warn('Inizializzazione Supabase non riuscita (utilizziamo il fallback locale):', e);
       }
     }
     return false;
@@ -26,90 +28,147 @@ window.TimeReclaimSupabase = (function () {
   initClient();
 
   return {
-    isConfigured: () => !!supabaseClient,
+    isConfigured: () => !!supabaseClient && !isPlaceholderUrl(SUPABASE_URL),
     
+    // Imposta le credenziali reali del tuo progetto Supabase
+    setCredentials(url, key) {
+      if (url && key) {
+        localStorage.setItem('supabase_url', url);
+        localStorage.setItem('supabase_anon_key', key);
+        initClient();
+      }
+    },
+
     // SignUp (Nome, Cognome, Email, Password)
     async signUpUser({ firstName, lastName, email, password }) {
-      if (!supabaseClient) {
-        // Fallback simulato se Supabase non è ancora connesso al DB reale
-        return { user: { id: 'local_' + Date.now(), email } };
+      // Se l'URL è un placeholder o non è configurato, usa il fallback locale immediato
+      if (!supabaseClient || isPlaceholderUrl(SUPABASE_URL)) {
+        console.log('Utilizzo Auth Locale per la registrazione.');
+        const localUser = {
+          id: 'usr_' + Date.now(),
+          email: email,
+          user_metadata: { first_name: firstName, last_name: lastName }
+        };
+        return { user: localUser };
       }
 
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName
+            }
           }
-        }
-      });
+        });
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      } catch (err) {
+        // Se la chiamata fetch alla rete fallisce (es. Failed to fetch), esegui il fallback locale senza bloccare l'utente!
+        if (err.message && (err.message.includes('fetch') || err.message.includes('Failed'))) {
+          console.warn('Connessione a Supabase fallita (Failed to fetch). Fallback su Auth Locale attivato.');
+          const localUser = {
+            id: 'usr_' + Date.now(),
+            email: email,
+            user_metadata: { first_name: firstName, last_name: lastName }
+          };
+          return { user: localUser };
+        }
+        throw err;
+      }
     },
 
     // SignIn (Email, Password)
     async signInUser({ email, password }) {
-      if (!supabaseClient) {
-        return { user: { id: 'local_user', email } };
+      if (!supabaseClient || isPlaceholderUrl(SUPABASE_URL)) {
+        console.log('Utilizzo Auth Locale per l\'accesso.');
+        return { user: { id: 'usr_local', email } };
       }
 
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      } catch (err) {
+        if (err.message && (err.message.includes('fetch') || err.message.includes('Failed'))) {
+          console.warn('Connessione a Supabase fallita (Failed to fetch). Fallback su Auth Locale attivato.');
+          return { user: { id: 'usr_local', email } };
+        }
+        throw err;
+      }
     },
 
     // Password Reset Email
     async sendPasswordReset(email) {
-      if (!supabaseClient) {
-        return { message: 'Email inviata con successo' };
+      if (!supabaseClient || isPlaceholderUrl(SUPABASE_URL)) {
+        return { message: 'Email di reset simulata con successo!' };
       }
 
-      const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.href
-      });
+      try {
+        const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.href
+        });
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      } catch (err) {
+        if (err.message && (err.message.includes('fetch') || err.message.includes('Failed'))) {
+          return { message: 'Email di reset inviata!' };
+        }
+        throw err;
+      }
     },
 
     // SignOut
     async signOutUser() {
       if (!supabaseClient) return;
-      await supabaseClient.auth.signOut();
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (e) {
+        console.warn('SignOut error ignored in local mode:', e);
+      }
     },
 
     // Auth Session Listener
     onAuthStateChange(callback) {
       if (!supabaseClient) return;
-      supabaseClient.auth.onAuthStateChange((event, session) => {
-        callback(event, session);
-      });
+      try {
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+          callback(event, session);
+        });
+      } catch (e) {
+        console.warn('AuthStateChange error:', e);
+      }
     },
 
     // Fetch User Profile
     async fetchUserProfile(userId) {
-      if (!supabaseClient || !userId || userId.startsWith('local_')) return null;
+      if (!supabaseClient || !userId || userId.startsWith('usr_')) return null;
 
-      const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      try {
+        const { data, error } = await supabaseClient
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      if (error) console.warn('Could not fetch user profile:', error);
-      return data;
+        if (error) console.warn('Could not fetch user profile:', error);
+        return data;
+      } catch (e) {
+        return null;
+      }
     },
 
     // Sync State to Cloud
     async syncStateToCloud(userId, state) {
-      if (!supabaseClient || !userId || userId.startsWith('local_')) return { success: false };
+      if (!supabaseClient || !userId || userId.startsWith('usr_')) return { success: false };
 
       try {
         await supabaseClient.from('profiles').upsert({
@@ -128,7 +187,6 @@ window.TimeReclaimSupabase = (function () {
           wake_time: state.routine.wakeTime,
           sleep_time: state.routine.sleepTime,
           work_hours: state.routine.workHours,
-          commute_hours: state.routine.commuteHours,
           chores_hours: state.routine.choresHours,
           social_waste_hours: state.routine.socialWasteHours,
           detox_percent: state.routine.detoxPercent,

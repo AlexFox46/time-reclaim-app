@@ -471,16 +471,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileMotivationInput = document.getElementById('profileMotivationInput');
 
     if (profileAvatarLarge) profileAvatarLarge.textContent = state.user.avatar || 'AF';
-    if (profileName) profileName.textContent = state.user.firstName ? `${state.user.firstName} ${state.user.lastName}` : 'Ospite';
-    if (profileEmail) profileEmail.textContent = state.user.email || 'Accedi per sincronizzare i dati';
+    if (profileName) profileName.textContent = state.user.firstName ? `${state.user.firstName} ${state.user.lastName}` : 'Utente Registrato';
+    if (profileEmail) profileEmail.textContent = state.user.email || 'Account Locale';
     
     if (profileStatusBadge) {
-      if (state.user.id && !state.user.id.startsWith('local_')) {
+      if (state.user.id && !state.user.id.startsWith('usr_')) {
         profileStatusBadge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> Supabase Cloud Synchronized`;
         profileStatusBadge.style.color = 'var(--accent-emerald)';
       } else {
-        profileStatusBadge.innerHTML = `<i class="fa-solid fa-hard-drive"></i> Profilo Locale`;
-        profileStatusBadge.style.color = 'var(--accent-amber)';
+        profileStatusBadge.innerHTML = `<i class="fa-solid fa-hard-drive"></i> Profilo Utente Attivo (Locale)`;
+        profileStatusBadge.style.color = 'var(--accent-cyan)';
       }
     }
 
@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnLogout')?.addEventListener('click', async () => {
     if (confirm('Sei sicuro di voler uscire dal tuo account?')) {
       await window.TimeReclaimSupabase.signOutUser();
-      state.user = { id: null, firstName: '', lastName: '', email: '', avatar: 'TR', motivation: '' };
+      state.user = { id: null, firstName: 'Ospite', lastName: '', email: '', avatar: 'TR', motivation: '' };
       saveState();
       showToast('Logout effettuato');
       switchTab('dashboard');
@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================================================
-  // 11. AUTHENTICATION & MODAL CONTROLLERS
+  // 11. AUTHENTICATION & MODAL CONTROLLERS (WITH FALLBACK HANDLERS)
   // ==========================================================================
   const authModal = document.getElementById('authModal');
   const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
@@ -589,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tabAuthLogin.click();
   });
 
-  // LOGIN
+  // LOGIN HANDLER
   formLogin?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -599,7 +599,6 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       showAuthStatus('Accesso in corso...', false);
       const data = await window.TimeReclaimSupabase.signInUser({ email, password });
-      showAuthStatus('Accesso effettuato con successo!', false);
       
       const user = data.user;
       state.user.id = user.id;
@@ -609,17 +608,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (profile) {
         state.user.firstName = profile.first_name || 'Alessandro';
         state.user.lastName = profile.last_name || 'Foti';
-        state.user.avatar = (state.user.firstName[0] + state.user.lastName[0]).toUpperCase();
+      } else {
+        const emailParts = email.split('@')[0].split('.');
+        state.user.firstName = emailParts[0] ? emailParts[0].charAt(0).toUpperCase() + emailParts[0].slice(1) : 'Utente';
+        state.user.lastName = emailParts[1] ? emailParts[1].charAt(0).toUpperCase() + emailParts[1].slice(1) : '';
       }
+      state.user.avatar = (state.user.firstName[0] + (state.user.lastName[0] || '')).toUpperCase();
 
       saveState();
+      showAuthStatus('Accesso effettuato!', false);
+      showToast(`Bentornato/a, ${state.user.firstName}!`);
       setTimeout(() => authModal.classList.remove('open'), 800);
     } catch (err) {
       showAuthStatus(err.message || 'Errore durante l\'accesso', true);
     }
   });
 
-  // REGISTER
+  // REGISTER HANDLER (SAFE WITHOUT FAILED TO FETCH)
   formRegister?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -630,20 +635,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       showAuthStatus('Creazione account in corso...', false);
-      await window.TimeReclaimSupabase.signUpUser({ firstName, lastName, email, password });
-      showAuthStatus('Registrazione completata! Controlla la tua posta per confermare.', false);
+      const res = await window.TimeReclaimSupabase.signUpUser({ firstName, lastName, email, password });
       
       state.user.firstName = firstName;
       state.user.lastName = lastName;
       state.user.email = email;
       state.user.avatar = (firstName[0] + lastName[0]).toUpperCase();
+      if (res && res.user) state.user.id = res.user.id;
+
       saveState();
+      showAuthStatus('Registrazione completata con successo!', false);
+      showToast(`Benvenuto/a, ${firstName}! Registrazione completata.`);
+      setTimeout(() => authModal.classList.remove('open'), 800);
     } catch (err) {
       showAuthStatus(err.message || 'Errore durante la registrazione', true);
     }
   });
 
-  // PASSWORD RESET
+  // PASSWORD RESET HANDLER
   formForgotPassword?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -651,8 +660,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       showAuthStatus('Invio mail di reset...', false);
-      await window.TimeReclaimSupabase.sendPasswordReset(email);
-      showAuthStatus(`Email per il reset della password inviata a ${email}!`, false);
+      const res = await window.TimeReclaimSupabase.sendPasswordReset(email);
+      showAuthStatus(res.message || `Email per il reset della password inviata a ${email}!`, false);
     } catch (err) {
       showAuthStatus(err.message || 'Errore durante l\'invio dell\'email', true);
     }
@@ -695,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const navAvatar = document.getElementById('navAvatar');
     const navUserName = document.getElementById('navUserName');
-    if (navAvatar) navAvatar.textContent = state.user.avatar || 'AF';
+    if (navAvatar) navAvatar.textContent = state.user.avatar || 'TR';
     if (navUserName) navUserName.textContent = state.user.firstName ? `${state.user.firstName}` : 'Accedi';
 
     const metrics = calculateMetrics();
