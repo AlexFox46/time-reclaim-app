@@ -58,8 +58,12 @@
           </button>
         </nav>
 
+        <button class="btn-glass btn-sm" id="openVisionModal" style="border-color: rgba(0, 242, 254, 0.4); color: var(--accent-cyan);">
+          <i class="fa-solid fa-lightbulb"></i> Visione & Need
+        </button>
+
         <button class="user-profile-btn" id="openAuthModal">
-          <div class="user-avatar" id="navAvatar">AF</div>
+          <div class="user-avatar" id="navAvatar">TR</div>
           <span class="user-name" id="navUserName">Accedi / Registrati</span>
         </button>
       </div>
@@ -245,7 +249,7 @@
                   <i class="fa-solid fa-sliders" style="color: var(--accent-cyan);"></i>
                   Configura la tua Routine Quotidiana
                 </h2>
-                <p class="card-subtitle">Mappa le tue 24 ore a partir dai vincoli fino ad allocare il tempo libero desiderato</p>
+                <p class="card-subtitle">Mappa le tue 24 ore a partire dai vincoli fino ad allocare il tempo libero desiderato</p>
               </div>
             </div>
           </div>
@@ -653,6 +657,51 @@
       </section>
 
     </main>
+
+    <!-- ==========================================
+         VISIONE, NEED & VALUE PROPOSITION MODAL
+         ========================================== -->
+    <div class="modal-backdrop" id="visionModal">
+      <div class="modal-glass" style="max-width: 600px;">
+        <div class="modal-header">
+          <h3 class="modal-title" style="color: var(--accent-cyan);">
+            <i class="fa-solid fa-compass"></i> Visione & Manifesto di Prodotto
+          </h3>
+          <button class="btn-close-modal" id="btnCloseVisionModal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.3); padding: 1rem; border-radius: var(--radius-md);">
+            <h4 style="color: var(--accent-pink); font-family: var(--font-heading); margin-bottom: 0.35rem;">
+              🔴 Need (Il Bisogno)
+            </h4>
+            <p style="font-size: 0.85rem; color: #e2e8f0;">
+              Lo scroll infinito sui social media ci isola dal mondo reale, ruba ore preziose ogni giorno e ci impedisce di coltivare le relazioni con amici, partner ed hobby che amiamo.
+            </p>
+          </div>
+
+          <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); padding: 1rem; border-radius: var(--radius-md);">
+            <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 0.35rem;">
+              🎯 Obiettivo del Progetto
+            </h4>
+            <p style="font-size: 0.85rem; color: #e2e8f0;">
+              Definire la propria routine a partire dalle ore di veglia/sonno e dagli impegni bloccati (lavoro, commute, casa), eliminare l'uso passivo dei social e riconquistare un "Budget di Tempo Intenzionale".
+            </p>
+          </div>
+
+          <div style="background: rgba(255, 183, 3, 0.1); border: 1px solid rgba(255, 183, 3, 0.3); padding: 1rem; border-radius: var(--radius-md);">
+            <h4 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 0.35rem;">
+              💎 Value Proposition
+            </h4>
+            <p style="font-size: 0.9rem; font-weight: 600; color: #fff; font-style: italic;">
+              "Riscopri il valore delle tue 24 ore: trasforma l'isolamento da scroll passivo sui social in tempo reale per la tua vita, le tue passioni e le tue relazioni."
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- ==========================================
          AUTH MODAL (ACCEDI / REGISTRATI / RECUPERO PASSWORD)

@@ -1,6 +1,6 @@
 /**
  * TIME RECLAIM & ROUTINE MAXIMIZER - CORE APPLICATION ENGINE
- * Estetica Liquid Glass (Glassmorphism 2.0) con Supabase Auth
+ * Estetica Liquid Glass (Glassmorphism 2.0) con Supabase Auth & Vision Modal
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveState() {
     try {
       localStorage.setItem('time_reclaim_state', JSON.stringify(state));
-      // Trigger Supabase sync if user is logged in
       if (window.TimeReclaimSupabase && window.TimeReclaimSupabase.isConfigured() && state.user.id) {
         window.TimeReclaimSupabase.syncStateToCloud(state.user.id, state);
       }
@@ -494,7 +493,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ==========================================================================
-  // 10. AUTHENTICATION & MODAL CONTROLLERS
+  // 10. VISION & MANIFESTO MODAL CONTROLLER
+  // ==========================================================================
+  const visionModal = document.getElementById('visionModal');
+  const openVisionModal = document.getElementById('openVisionModal');
+  const btnCloseVisionModal = document.getElementById('btnCloseVisionModal');
+
+  openVisionModal?.addEventListener('click', () => visionModal.classList.add('open'));
+  btnCloseVisionModal?.addEventListener('click', () => visionModal.classList.remove('open'));
+
+  // ==========================================================================
+  // 11. AUTHENTICATION & MODAL CONTROLLERS
   // ==========================================================================
   const authModal = document.getElementById('authModal');
   const openAuthModal = document.getElementById('openAuthModal');
@@ -581,7 +590,6 @@ document.addEventListener('DOMContentLoaded', () => {
       state.user.id = user.id;
       state.user.email = user.email;
       
-      // Load user profile from Supabase if available
       const profile = await window.TimeReclaimSupabase.fetchUserProfile(user.id);
       if (profile) {
         state.user.firstName = profile.first_name || 'Alessandro';
@@ -596,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // SUBMIT 2: REGISTRATION (Nome, Cognome, Email, Password)
+  // SUBMIT 2: REGISTRATION
   formRegister?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -686,7 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================================================
-  // 11. GLOBAL RENDER ALL FUNCTION
+  // 12. GLOBAL RENDER ALL FUNCTION
   // ==========================================================================
   function renderAll() {
     // Nav Profile update
