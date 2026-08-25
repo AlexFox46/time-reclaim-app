@@ -74,87 +74,86 @@
     <main>
       
       <!-- ==========================================
-           VIEW 1: DASHBOARD (MAIN HUB)
+           VIEW 1: DASHBOARD (RIORGANIZZATA UX)
            ========================================== -->
       <section id="view-dashboard" class="view-section active">
         
-        <!-- Metrics Row -->
-        <div class="stats-cards-row">
-          <div class="stat-card">
-            <div class="stat-icon" style="background: var(--accent-cyan);"><i class="fa-solid fa-bolt"></i></div>
-            <div class="stat-info">
-              <h3 id="statAwakeHours">16.0 h</h3>
-              <p>Veglia Utile</p>
-            </div>
+        <!-- Top Key KPIs Row -->
+        <div class="top-kpis-grid">
+          <div class="kpi-box">
+            <div class="kpi-icon" style="background: var(--accent-cyan);"><i class="fa-solid fa-bolt"></i></div>
+            <div class="kpi-val" id="statFreeHours">4.5 h</div>
+            <div class="kpi-lbl">Tempo Libero / Giorno</div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-icon" style="background: var(--accent-pink);"><i class="fa-solid fa-shield-halved"></i></div>
-            <div class="stat-info">
-              <h3 id="statReclaimedHours">2.5 h</h3>
-              <p>Riconquistate</p>
-            </div>
+          <div class="kpi-box">
+            <div class="kpi-icon" style="background: var(--accent-pink);"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="kpi-val" id="statReclaimedHours">2.1 h</div>
+            <div class="kpi-lbl">Riconquistate dai Social</div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-icon" style="background: var(--accent-amber);"><i class="fa-solid fa-heart"></i></div>
-            <div class="stat-info">
-              <h3 id="statRelationScore">85%</h3>
-              <p>Indice Vita</p>
-            </div>
+          <div class="kpi-box">
+            <div class="kpi-icon" style="background: var(--accent-emerald);"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="kpi-val" id="statUsefulHours">3.5 h</div>
+            <div class="kpi-lbl">Attività Utili Allocate</div>
           </div>
         </div>
 
-        <!-- 24h Timeline Widget with Clear Legend -->
-        <div class="glass-card">
+        <!-- Panoramica Settimana Corrente (Ore Accumulate) -->
+        <div class="glass-card" style="margin-top: 0.85rem;">
           <div class="card-header" style="margin-bottom: 0.4rem;">
             <div>
               <h2 class="card-title">
-                <i class="fa-solid fa-timeline" style="color: var(--accent-cyan);"></i>
-                Mappa delle 24 Ore Oggi
+                <i class="fa-solid fa-calendar-week" style="color: var(--accent-cyan);"></i>
+                Panoramica Settimana Corrente
               </h2>
-              <p class="card-subtitle">Fasce orarie libere evidenziate</p>
+              <p class="card-subtitle">Ore cumulate questa settimana per ciascuna attività</p>
             </div>
+            <span class="badge badge-cyan" id="weeklyTotalBadge">Totale: 28 Ore</span>
           </div>
 
-          <!-- 24 Hourly Time Slots Grid -->
-          <div class="timeline-24h-grid" id="dashboardHourlyGrid">
-            <!-- Rendered dynamically -->
-          </div>
-
-          <!-- Timeline Color Legend -->
-          <div class="timeline-legend">
-            <div class="legend-item">
-              <div class="legend-color-dot" style="background: rgba(142, 45, 226, 0.75);"></div>
-              <span>🌙 Sonno (00-07)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color-dot" style="background: rgba(59, 130, 246, 0.75);"></div>
-              <span>💼 Lavoro (08-17)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color-dot" style="background: rgba(255, 0, 127, 0.85);"></div>
-              <span>📱 Social (17-18)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color-dot" style="background: var(--accent-cyan);"></div>
-              <span>✨ Libero (18-23)</span>
-            </div>
+          <div class="weekly-summary-grid" id="weeklyCategorySummaryGrid">
+            <!-- Dynamic Category Progress Bars -->
           </div>
         </div>
 
         <div class="dashboard-grid">
-          <!-- Left Column: Circular Donut Chart & Harmony -->
+          
+          <!-- Column 1: Daily Actions First + Detailed Today Donut Wheel -->
           <div class="dashboard-left">
             
+            <!-- 1. CHECKLIST OGGI (POSIZIONATA PRIMA) -->
+            <div class="glass-card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">
+                    <i class="fa-solid fa-list-check" style="color: var(--accent-emerald);"></i>
+                    Da Fare Oggi (Piano Intenzionale)
+                  </h3>
+                  <p class="card-subtitle">Spunta le attività completate</p>
+                </div>
+                <span class="badge badge-emerald" id="todayStreakBadge">🔥 3 Giorni Streak</span>
+              </div>
+
+              <!-- Checklist Items -->
+              <div class="checklist-container" id="dailyChecklist"></div>
+
+              <!-- Quick Add Inline Input -->
+              <div class="quick-add-row">
+                <input type="text" class="quick-add-input" id="quickAddTitle" placeholder="+ Aggiungi attività rapida per oggi...">
+                <button class="btn-glass btn-primary btn-sm" id="btnQuickAdd">Aggiungi</button>
+              </div>
+            </div>
+
+            <!-- 2. DETTAGLIO GIORNATA DI OGGI (RUOTA 24H & TIMELINE) -->
             <div class="glass-card">
               <div class="card-header">
                 <div>
                   <h3 class="card-title">
                     <i class="fa-solid fa-chart-pie" style="color: var(--accent-cyan);"></i>
-                    Ripartizione delle 24h
+                    Dettaglio 24h della Giornata di Oggi
                   </h3>
-                  <p class="card-subtitle">Visualizzazione sintetica</p>
+                  <p class="card-subtitle">Ripartizione visiva delle tue ore</p>
                 </div>
                 <button class="btn-glass btn-sm" id="btnEditRoutine">Modifica</button>
               </div>
@@ -162,7 +161,7 @@
               <div class="time-wheel-container">
                 <div class="time-wheel-svg-wrapper">
                   <svg id="timeWheelSvg" viewBox="0 0 200 200" width="100%" height="100%">
-                    <!-- Dynamic SVG arcs rendered via JS -->
+                    <!-- Dynamic SVG arcs -->
                   </svg>
                   <div class="time-wheel-center-info">
                     <div class="wheel-big-val" id="wheelFreeTimeDisplay">4.5h</div>
@@ -171,33 +170,46 @@
                 </div>
               </div>
 
-              <div class="categories-breakdown" id="categoriesBreakdownList">
+              <!-- Timeline Heatmap with Legend -->
+              <div style="margin-top: 1rem;">
+                <div class="timeline-24h-grid" id="dashboardHourlyGrid"></div>
+                <div class="timeline-legend">
+                  <div class="legend-item"><div class="legend-color-dot" style="background: rgba(142, 45, 226, 0.75);"></div><span>🌙 Sonno</span></div>
+                  <div class="legend-item"><div class="legend-color-dot" style="background: rgba(59, 130, 246, 0.75);"></div><span>💼 Impegni</span></div>
+                  <div class="legend-item"><div class="legend-color-dot" style="background: rgba(255, 0, 127, 0.85);"></div><span>📱 Social</span></div>
+                  <div class="legend-item"><div class="legend-color-dot" style="background: var(--accent-cyan);"></div><span>✨ Libero</span></div>
+                </div>
+              </div>
+
+              <div class="categories-breakdown" id="categoriesBreakdownList" style="margin-top: 1rem;">
                 <!-- Rendered dynamically -->
               </div>
             </div>
 
-            <!-- Harmony Balance Bar -->
+          </div>
+
+          <!-- Column 2: Harmony & Social Impact -->
+          <div class="dashboard-right">
+            
+            <!-- 3. BILANCIAMENTO VITA & RELAX -->
             <div class="glass-card">
               <div class="card-header">
-                <h3 class="card-title"><i class="fa-solid fa-scale-balanced" style="color: var(--accent-amber);"></i> Bilanciamento Vita</h3>
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-scale-balanced" style="color: var(--accent-amber);"></i> Bilanciamento Vita</h3>
+                  <p class="card-subtitle">Equilibrio crescita, svago e riposo</p>
+                </div>
                 <span class="badge badge-emerald" id="harmonyStatusBadge">Bilanciato</span>
               </div>
               <div class="harmony-bar-container" id="harmonyBar"></div>
-            </div>
-
-          </div>
-
-          <!-- Right Column: Daily Checklist & Social Impact -->
-          <div class="dashboard-right">
-            
-            <div class="glass-card">
-              <div class="card-header">
-                <h3 class="card-title"><i class="fa-solid fa-list-check" style="color: var(--accent-emerald);"></i> Da Fare Oggi</h3>
+              
+              <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: 0.4rem;">
+                <span><i class="fa-solid fa-circle" style="color: var(--accent-cyan);"></i> Crescita</span>
+                <span><i class="fa-solid fa-circle" style="color: var(--accent-purple);"></i> Cinema</span>
+                <span><i class="fa-solid fa-circle" style="color: #70e000;"></i> Relax</span>
               </div>
-              <div class="checklist-container" id="dailyChecklist"></div>
             </div>
 
-            <!-- Social Detox Impact Card -->
+            <!-- 4. IMPATTO ANTI-SOCIAL -->
             <div class="glass-card detox-impact-card">
               <div class="card-header">
                 <h3 class="card-title" style="color: #fff;"><i class="fa-solid fa-fire" style="color: var(--accent-pink);"></i> Impatto Anti-Social</h3>
@@ -221,17 +233,24 @@
       </section>
 
       <!-- ==========================================
-           VIEW 2: ROUTINE SETUP WIZARD
+           VIEW 2: ROUTINE SETUP WIZARD (PRESETS & 7 GIORNI)
            ========================================== -->
       <section id="view-wizard" class="view-section">
         <div class="wizard-container">
           
+          <!-- 1-Click Presets Quick Selector -->
           <div class="glass-card" style="margin-bottom: 0.85rem;">
-            <div class="card-header" style="margin-bottom: 0;">
+            <div class="card-header" style="margin-bottom: 0.5rem;">
               <div>
-                <h2 class="card-title"><i class="fa-solid fa-sliders" style="color: var(--accent-cyan);"></i> Configura Routine</h2>
-                <p class="card-subtitle">Mappa le tue 24 ore in 4 passaggi</p>
+                <h2 class="card-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-cyan);"></i> Setup Routine Iniziale</h2>
+                <p class="card-subtitle">Scegli un preset 1-click o personalizza i tuoi impegni</p>
               </div>
+            </div>
+
+            <div class="presets-row">
+              <button class="preset-chip-btn" id="presetWorker"><i class="fa-solid fa-briefcase" style="color: var(--accent-blue);"></i> Lavoratore 9-18</button>
+              <button class="preset-chip-btn" id="presetStudent"><i class="fa-solid fa-graduation-cap" style="color: var(--accent-cyan);"></i> Studente</button>
+              <button class="preset-chip-btn" id="presetSmart"><i class="fa-solid fa-laptop" style="color: var(--accent-emerald);"></i> Smart Working</button>
             </div>
           </div>
 
@@ -264,27 +283,55 @@
             </div>
           </div>
 
-          <!-- STEP 2: LOCKED HOURS -->
+          <!-- STEP 2: LOCKED COMMITMENTS (WITH DURATION, TIME SLOT & DAYS) -->
           <div class="wizard-step-content" id="wizardStep2">
             <div class="glass-card">
               <div class="card-header">
-                <h3 class="card-title">Passo 2: Impegni Bloccati</h3>
-                <span class="badge badge-amber">Tempo Bloccato</span>
+                <div>
+                  <h3 class="card-title">Passo 2: Impegni Bloccati & Orari</h3>
+                  <p class="card-subtitle">Imposta durata, orari e giorni della settimana</p>
+                </div>
+                <span class="badge badge-amber">Impegni Fissi</span>
               </div>
+
+              <!-- Work / Main Study -->
               <div class="form-group">
-                <label class="form-label">Lavoro / Studio</label>
+                <label class="form-label">Lavoro / Studio Principale</label>
                 <div class="range-container">
-                  <div class="range-val-display"><span>Lavoro:</span><span id="workHoursVal">8.0 Ore</span></div>
+                  <div class="range-val-display"><span>Durata:</span><span id="workHoursVal">8.0 Ore</span></div>
                   <input type="range" class="input-range" id="workHoursInput" min="0" max="12" step="0.5" value="8">
                 </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                  <div>
+                    <label style="font-size: 0.7rem; color: var(--text-muted);">Dalle ore</label>
+                    <input type="time" class="input-glass" id="workStartInput" value="09:00">
+                  </div>
+                  <div>
+                    <label style="font-size: 0.7rem; color: var(--text-muted);">Alle ore</label>
+                    <input type="time" class="input-glass" id="workEndInput" value="17:00">
+                  </div>
+                </div>
+                <!-- Day Chips Selector -->
+                <div class="day-chips-container" id="workDaysChips">
+                  <div class="day-chip selected" data-day="lun">Lun</div>
+                  <div class="day-chip selected" data-day="mar">Mar</div>
+                  <div class="day-chip selected" data-day="mer">Mer</div>
+                  <div class="day-chip selected" data-day="gio">Gio</div>
+                  <div class="day-chip selected" data-day="ven">Ven</div>
+                  <div class="day-chip" data-day="sab">Sab</div>
+                  <div class="day-chip" data-day="dom">Dom</div>
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Spostamenti / Casa / Pasti</label>
+
+              <!-- Chores / Commute -->
+              <div class="form-group" style="margin-top: 1.25rem;">
+                <label class="form-label">Spostamenti, Casa & Pasti</label>
                 <div class="range-container">
-                  <div class="range-val-display"><span>Faccende e Spostamenti:</span><span id="choresHoursVal">3.5 Ore</span></div>
+                  <div class="range-val-display"><span>Durata:</span><span id="choresHoursVal">3.5 Ore</span></div>
                   <input type="range" class="input-range" id="choresHoursInput" min="0.5" max="6" step="0.5" value="3.5">
                 </div>
               </div>
+
               <div class="wizard-actions">
                 <button class="btn-glass" id="btnStep2Prev"><i class="fa-solid fa-arrow-left"></i> Indietro</button>
                 <button class="btn-glass btn-primary" id="btnStep2Next">Avanti <i class="fa-solid fa-arrow-right"></i></button>
@@ -409,12 +456,11 @@
       </section>
 
       <!-- ==========================================
-           VIEW 4: SCHERMATA PROFILO UTENTE (NEW)
+           VIEW 4: SCHERMATA PROFILO UTENTE
            ========================================== -->
       <section id="view-profile" class="view-section">
         <div style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
           
-          <!-- Profile Main Card -->
           <div class="glass-card profile-card">
             <div class="profile-avatar-large" id="profileAvatarLarge">AF</div>
             <h2 class="profile-name" id="profileName">Alessandro Foti</h2>
@@ -433,38 +479,30 @@
             </div>
           </div>
 
-          <!-- Profile Stats Summary Card -->
           <div class="glass-card">
             <div class="card-header">
               <h3 class="card-title"><i class="fa-solid fa-chart-line" style="color: var(--accent-cyan);"></i> Le tue Metriche di Routine</h3>
             </div>
 
-            <div class="stats-cards-row">
-              <div class="stat-card">
-                <div class="stat-icon" style="background: var(--accent-cyan);"><i class="fa-solid fa-bolt"></i></div>
-                <div class="stat-info">
-                  <h3 id="profileAwake">16.0h</h3>
-                  <p>Veglia</p>
-                </div>
+            <div class="top-kpis-grid">
+              <div class="kpi-box">
+                <div class="kpi-icon" style="background: var(--accent-cyan);"><i class="fa-solid fa-bolt"></i></div>
+                <div class="kpi-val" id="profileAwake">16.0h</div>
+                <div class="kpi-lbl">Veglia</div>
               </div>
-              <div class="stat-card">
-                <div class="stat-icon" style="background: var(--accent-pink);"><i class="fa-solid fa-shield-halved"></i></div>
-                <div class="stat-info">
-                  <h3 id="profileReclaimed">2.5h</h3>
-                  <p>Salvate</p>
-                </div>
+              <div class="kpi-box">
+                <div class="kpi-icon" style="background: var(--accent-pink);"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="kpi-val" id="profileReclaimed">2.5h</div>
+                <div class="kpi-lbl">Salvate</div>
               </div>
-              <div class="stat-card">
-                <div class="stat-icon" style="background: var(--accent-amber);"><i class="fa-solid fa-heart"></i></div>
-                <div class="stat-info">
-                  <h3 id="profileScore">85%</h3>
-                  <p>Score Vita</p>
-                </div>
+              <div class="kpi-box">
+                <div class="kpi-icon" style="background: var(--accent-amber);"><i class="fa-solid fa-heart"></i></div>
+                <div class="kpi-val" id="profileScore">85%</div>
+                <div class="kpi-lbl">Score Vita</div>
               </div>
             </div>
           </div>
 
-          <!-- Account Actions Card -->
           <div class="glass-card">
             <div class="card-header">
               <h3 class="card-title"><i class="fa-solid fa-gear" style="color: var(--text-muted);"></i> Gestione Account</h3>

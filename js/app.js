@@ -1,6 +1,6 @@
 /**
  * TIME RECLAIM & ROUTINE MAXIMIZER - NATIVE MOBILE APP ENGINE
- * Estetica Mobile App (PWA feel) con Bottom Navbar e Schermata Profilo
+ * Estetica Mobile App (PWA feel) con UX Riorganizzata, Presets 1-Click e Settimana Corrente
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
       wakeTime: '07:00',
       sleepTime: '23:00',
       workHours: 8.0,
+      workStart: '09:00',
+      workEnd: '17:00',
+      workDays: ['lun', 'mar', 'mer', 'gio', 'ven'],
       choresHours: 3.5,
       socialWasteHours: 3.0,
       detoxPercent: 0.7
@@ -30,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
       productive: 1.5,
       fitness: 1.0,
       cinema: 1.0,
-      relations: 0.0,
       boredom: 1.0
     },
     checklist: [
@@ -102,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalIntentionalBudget = Math.max(0, awakeHours - lockedHours - socialWasteResidue);
 
     const totalAllocated = a.productive + a.fitness + a.cinema + a.boredom;
+    const usefulAllocated = a.productive + a.fitness;
     const unallocatedTime = Math.max(0, totalIntentionalBudget - totalAllocated);
 
     const relationScore = Math.min(100, Math.round(((totalAllocated + reclaimedSocialHours) / 6.0) * 100));
@@ -113,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       socialWasteResidue,
       totalIntentionalBudget,
       totalAllocated,
+      usefulAllocated,
       unallocatedTime,
       relationScore
     };
@@ -137,13 +141,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Header Avatar button opens profile tab directly
   document.getElementById('headerAvatarBtn')?.addEventListener('click', () => {
     switchTab('profile');
   });
 
   // ==========================================================================
-  // 5. WIZARD STEP NAVIGATION & SLIDERS
+  // 5. WIZARD STEP NAVIGATION & PRESETS 1-CLICK
   // ==========================================================================
   let currentWizardStep = 1;
   const totalWizardSteps = 4;
@@ -166,6 +169,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressPercent = ((currentWizardStep - 1) / (totalWizardSteps - 1)) * 100;
     if (wizardProgressFill) wizardProgressFill.style.width = `${progressPercent}%`;
   }
+
+  // Preset 1-Click Buttons
+  document.getElementById('presetWorker')?.addEventListener('click', () => {
+    state.routine.sleepHours = 8.0;
+    state.routine.workHours = 8.0;
+    state.routine.choresHours = 3.5;
+    state.routine.socialWasteHours = 3.0;
+    state.routine.detoxPercent = 0.7;
+    saveState();
+    showToast('Preset "Lavoratore 9-18" applicato!');
+  });
+
+  document.getElementById('presetStudent')?.addEventListener('click', () => {
+    state.routine.sleepHours = 8.0;
+    state.routine.workHours = 6.0;
+    state.routine.choresHours = 2.5;
+    state.routine.socialWasteHours = 4.0;
+    state.routine.detoxPercent = 0.7;
+    saveState();
+    showToast('Preset "Studente" applicato!');
+  });
+
+  document.getElementById('presetSmart')?.addEventListener('click', () => {
+    state.routine.sleepHours = 7.5;
+    state.routine.workHours = 7.0;
+    state.routine.choresHours = 2.0;
+    state.routine.socialWasteHours = 2.5;
+    state.routine.detoxPercent = 0.8;
+    saveState();
+    showToast('Preset "Smart Working" applicato!');
+  });
+
+  // Day Chips Selector
+  const dayChips = document.querySelectorAll('.day-chip');
+  dayChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('selected');
+      const selectedDays = Array.from(document.querySelectorAll('.day-chip.selected')).map(c => c.dataset.day);
+      state.routine.workDays = selectedDays;
+      saveState();
+    });
+  });
 
   // Wizard Step Buttons
   document.getElementById('btnStep1Next')?.addEventListener('click', () => { currentWizardStep = 2; updateWizardUI(); });
@@ -353,14 +398,48 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 8. DAILY CHECKLIST RENDERER
+  // 8. WEEKLY CURRENT SUMMARY RENDERER
+  // ==========================================================================
+  function renderWeeklyCategorySummary() {
+    const grid = document.getElementById('weeklyCategorySummaryGrid');
+    if (!grid) return;
+
+    const a = state.allocations;
+    const cats = [
+      { name: 'Studio & Crescita', hours: a.productive * 7, color: 'var(--accent-cyan)' },
+      { name: 'Sport & Salute', hours: a.fitness * 7, color: 'var(--accent-emerald)' },
+      { name: 'Cinema & Svago', hours: a.cinema * 7, color: 'var(--accent-purple)' },
+      { name: 'Relax & Noia', hours: a.boredom * 7, color: '#70e000' }
+    ];
+
+    const maxHours = 35.0; // Benchmark 35h max per category per week
+
+    grid.innerHTML = cats.map(c => `
+      <div class="weekly-cat-box">
+        <div class="weekly-cat-header">
+          <span style="font-weight: 700;">${c.name}</span>
+          <strong style="color: ${c.color};">${c.hours.toFixed(1)}h</strong>
+        </div>
+        <div class="weekly-progress-bar">
+          <div class="weekly-progress-fill" style="width: ${Math.min(100, (c.hours / maxHours) * 100)}%; background: ${c.color};"></div>
+        </div>
+      </div>
+    `).join('');
+
+    const totalWeeklyAllocated = (a.productive + a.fitness + a.cinema + a.boredom) * 7;
+    const weeklyTotalBadge = document.getElementById('weeklyTotalBadge');
+    if (weeklyTotalBadge) weeklyTotalBadge.textContent = `Totale: ${totalWeeklyAllocated.toFixed(1)} Ore/Settimana`;
+  }
+
+  // ==========================================================================
+  // 9. DAILY CHECKLIST & QUICK ADD INLINE
   // ==========================================================================
   function renderDailyChecklist() {
     const container = document.getElementById('dailyChecklist');
     if (!container) return;
 
     if (state.checklist.length === 0) {
-      container.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted);">Nessuna attività pianificata oggi. Aggiungine una dalla Banca Attività!</p>`;
+      container.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted);">Nessuna attività pianificata oggi. Aggiungine una qui sotto!</p>`;
       return;
     }
 
@@ -388,8 +467,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Inline Quick Add Handler
+  document.getElementById('btnQuickAdd')?.addEventListener('click', addQuickActivityInline);
+  document.getElementById('quickAddTitle')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addQuickActivityInline();
+  });
+
+  function addQuickActivityInline() {
+    const input = document.getElementById('quickAddTitle');
+    const title = input?.value.trim();
+    if (title) {
+      state.checklist.push({
+        id: Date.now().toString(),
+        title: title,
+        duration: '1.0h',
+        category: 'productive',
+        completed: false
+      });
+      input.value = '';
+      saveState();
+      showToast(`Attività "${title}" aggiunta al tuo piano di oggi!`);
+    }
+  }
+
   // ==========================================================================
-  // 9. TIME BANK & CUSTOM ACTIVITIES
+  // 10. TIME BANK & CUSTOM ACTIVITIES
   // ==========================================================================
   function renderCustomActivities() {
     const grid = document.getElementById('customActivitiesGrid');
@@ -459,7 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 10. USER PROFILE SCREEN RENDERER
+  // 11. USER PROFILE SCREEN RENDERER
   // ==========================================================================
   function renderUserProfile() {
     const metrics = calculateMetrics();
@@ -525,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================================================
-  // 11. AUTHENTICATION & MODAL CONTROLLERS (WITH FALLBACK HANDLERS)
+  // 12. AUTHENTICATION & MODALS
   // ==========================================================================
   const authModal = document.getElementById('authModal');
   const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
@@ -624,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // REGISTER HANDLER (SAFE WITHOUT FAILED TO FETCH)
+  // REGISTER HANDLER
   formRegister?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -697,7 +799,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================================================
-  // 12. GLOBAL RENDER ALL FUNCTION
+  // 13. GLOBAL RENDER ALL FUNCTION
   // ==========================================================================
   function renderAll() {
     const r = state.routine;
@@ -708,14 +810,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navUserName) navUserName.textContent = state.user.firstName ? `${state.user.firstName}` : 'Accedi';
 
     const metrics = calculateMetrics();
-    const statAwakeHours = document.getElementById('statAwakeHours');
-    if (statAwakeHours) statAwakeHours.textContent = `${metrics.awakeHours.toFixed(1)} h`;
+
+    // Top KPIs
+    const statFreeHours = document.getElementById('statFreeHours');
+    if (statFreeHours) statFreeHours.textContent = `${metrics.totalIntentionalBudget.toFixed(1)} h`;
 
     const statReclaimedHours = document.getElementById('statReclaimedHours');
     if (statReclaimedHours) statReclaimedHours.textContent = `${metrics.reclaimedSocialHours.toFixed(1)} h`;
 
-    const statRelationScore = document.getElementById('statRelationScore');
-    if (statRelationScore) statRelationScore.textContent = `${metrics.relationScore}%`;
+    const statUsefulHours = document.getElementById('statUsefulHours');
+    if (statUsefulHours) statUsefulHours.textContent = `${metrics.usefulAllocated.toFixed(1)} h`;
 
     // Sliders sync
     if (sleepHoursInput) sleepHoursInput.value = r.sleepHours;
@@ -746,6 +850,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDetoxShowcase();
     renderCustomActivities();
     renderHourlyTimeline('dashboardHourlyGrid');
+    renderWeeklyCategorySummary();
     renderUserProfile();
   }
 
