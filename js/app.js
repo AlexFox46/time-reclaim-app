@@ -1,6 +1,6 @@
 /**
  * TIME RECLAIM & ROUTINE MAXIMIZER - CORE APPLICATION ENGINE
- * Estetica Liquid Glass (Glassmorphism 2.0) con Supabase Auth & Vision Modal
+ * Estetica Liquid Glass (Glassmorphism 2.0) con Timeline 24h & Vista Settimanale
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       avatar: 'AF',
       motivation: 'Coltivare le mie relazioni ed eliminare il tempo perso sui social'
     },
+    preset: 'feriale', // 'feriale' or 'festivo'
     routine: {
       sleepHours: 8.0,
       wakeTime: '07:00',
@@ -27,6 +28,16 @@ document.addEventListener('DOMContentLoaded', () => {
       socialWasteHours: 3.0,
       detoxPercent: 0.7
     },
+    routineFestivo: {
+      sleepHours: 9.0,
+      wakeTime: '08:30',
+      sleepTime: '00:00',
+      workHours: 1.0,
+      commuteHours: 0.0,
+      choresHours: 2.0,
+      socialWasteHours: 2.0,
+      detoxPercent: 0.8
+    },
     allocations: {
       productive: 1.5,
       fitness: 1.0,
@@ -34,6 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
       relations: 1.5,
       boredom: 1.0
     },
+    relationalGoals: [
+      { id: 'rel1', title: 'Cena con Marco & Sara', date: 'Venerdì Sera', hours: 2.5, category: 'relations', icon: 'fa-utensils' },
+      { id: 'rel2', title: 'Chiamata in famiglia', date: 'Domenica Pomeriggio', hours: 1.0, category: 'relations', icon: 'fa-phone' },
+      { id: 'rel3', title: 'Aperitivo con il team', date: 'Mercoledì 18:30', hours: 1.5, category: 'relations', icon: 'fa-glass-cheers' }
+    ],
     checklist: [
       { id: '1', title: 'Sessione di Studio / Lettura', duration: '1.5h', category: 'productive', completed: false },
       { id: '2', title: 'Allenamento o Corsa', duration: '1.0h', category: 'fitness', completed: true },
@@ -74,11 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAll();
   }
 
+  // Active routine based on preset
+  function getActiveRoutine() {
+    return state.preset === 'festivo' ? state.routineFestivo : state.routine;
+  }
+
   // ==========================================================================
   // 2. MATHEMATICAL ROUTINE AUDIT CALCULATIONS
   // ==========================================================================
   function calculateMetrics() {
-    const r = state.routine;
+    const r = getActiveRoutine();
     const a = state.allocations;
 
     const awakeHours = 24.0 - r.sleepHours;
@@ -185,9 +206,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const step1AwakeCalc = document.getElementById('step1AwakeCalc');
 
   sleepHoursInput?.addEventListener('input', (e) => {
-    state.routine.sleepHours = parseFloat(e.target.value);
-    if (sleepHoursVal) sleepHoursVal.textContent = `${state.routine.sleepHours.toFixed(1)} Ore`;
-    const awake = 24.0 - state.routine.sleepHours;
+    const r = getActiveRoutine();
+    r.sleepHours = parseFloat(e.target.value);
+    if (sleepHoursVal) sleepHoursVal.textContent = `${r.sleepHours.toFixed(1)} Ore`;
+    const awake = 24.0 - r.sleepHours;
     if (step1AwakeCalc) step1AwakeCalc.textContent = `${awake.toFixed(1)} Ore / Giorno`;
     saveState();
   });
@@ -200,13 +222,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   [workHoursInput, commuteHoursInput, choresHoursInput].forEach(inp => {
     inp?.addEventListener('input', () => {
-      state.routine.workHours = parseFloat(workHoursInput.value);
-      state.routine.commuteHours = parseFloat(commuteHoursInput.value);
-      state.routine.choresHours = parseFloat(choresHoursInput.value);
+      const r = getActiveRoutine();
+      r.workHours = parseFloat(workHoursInput.value);
+      r.commuteHours = parseFloat(commuteHoursInput.value);
+      r.choresHours = parseFloat(choresHoursInput.value);
       
-      document.getElementById('workHoursVal').textContent = `${state.routine.workHours.toFixed(1)} Ore`;
-      document.getElementById('commuteHoursVal').textContent = `${state.routine.commuteHours.toFixed(1)} Ore`;
-      document.getElementById('choresHoursVal').textContent = `${state.routine.choresHours.toFixed(1)} Ore`;
+      document.getElementById('workHoursVal').textContent = `${r.workHours.toFixed(1)} Ore`;
+      document.getElementById('commuteHoursVal').textContent = `${r.commuteHours.toFixed(1)} Ore`;
+      document.getElementById('choresHoursVal').textContent = `${r.choresHours.toFixed(1)} Ore`;
 
       const metrics = calculateMetrics();
       if (step2RawCalc) step2RawCalc.textContent = `${metrics.totalIntentionalBudget.toFixed(1)} Ore / Giorno`;
@@ -221,8 +244,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const detoxCards = document.querySelectorAll('[data-detox-percent]');
 
   socialWasteInput?.addEventListener('input', (e) => {
-    state.routine.socialWasteHours = parseFloat(e.target.value);
-    if (socialWasteVal) socialWasteVal.textContent = `${state.routine.socialWasteHours.toFixed(1)} Ore/giorno`;
+    const r = getActiveRoutine();
+    r.socialWasteHours = parseFloat(e.target.value);
+    if (socialWasteVal) socialWasteVal.textContent = `${r.socialWasteHours.toFixed(1)} Ore/giorno`;
     const metrics = calculateMetrics();
     if (step3ReclaimedCalc) step3ReclaimedCalc.textContent = `+${metrics.reclaimedSocialHours.toFixed(1)} Ore Riconquistate!`;
     saveState();
@@ -232,7 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
     card.addEventListener('click', () => {
       detoxCards.forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
-      state.routine.detoxPercent = parseFloat(card.dataset.detoxPercent);
+      const r = getActiveRoutine();
+      r.detoxPercent = parseFloat(card.dataset.detoxPercent);
       const metrics = calculateMetrics();
       if (step3ReclaimedCalc) step3ReclaimedCalc.textContent = `+${metrics.reclaimedSocialHours.toFixed(1)} Ore Riconquistate!`;
       saveState();
@@ -257,6 +282,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Preset Toggles (Feriale vs Festivo)
+  document.getElementById('btnPresetFeriale')?.addEventListener('click', () => {
+    state.preset = 'feriale';
+    document.getElementById('btnPresetFeriale').classList.add('active');
+    document.getElementById('btnPresetFestivo').classList.remove('active');
+    saveState();
+  });
+
+  document.getElementById('btnPresetFestivo')?.addEventListener('click', () => {
+    state.preset = 'festivo';
+    document.getElementById('btnPresetFestivo').classList.add('active');
+    document.getElementById('btnPresetFeriale').classList.remove('active');
+    saveState();
+  });
+
   // ==========================================================================
   // 5. 24-HOUR SVG DONUT WHEEL RENDERER
   // ==========================================================================
@@ -264,11 +304,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const svg = document.getElementById('timeWheelSvg');
     if (!svg) return;
 
-    const r = state.routine;
+    const r = getActiveRoutine();
     const a = state.allocations;
     const metrics = calculateMetrics();
 
-    // Data segments in 24 hours
     const segments = [
       { label: 'Sonno', hours: r.sleepHours, color: '#8e2de2' },
       { label: 'Impegni Fissi', hours: metrics.lockedHours, color: '#3b82f6' },
@@ -286,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const center = 100;
     const circumference = 2 * Math.PI * radius;
 
-    let currentAngle = -90; // Start at top 12 o'clock
+    let currentAngle = -90;
     let svgContent = '';
 
     segments.forEach((seg) => {
@@ -315,13 +354,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     svg.innerHTML = svgContent;
 
-    // Center Big Value Update
     const wheelFreeTimeDisplay = document.getElementById('wheelFreeTimeDisplay');
     if (wheelFreeTimeDisplay) {
       wheelFreeTimeDisplay.textContent = `${metrics.totalIntentionalBudget.toFixed(1)}h`;
     }
 
-    // Categories Breakdown Legend Update
     const breakdownList = document.getElementById('categoriesBreakdownList');
     if (breakdownList) {
       breakdownList.innerHTML = segments.map(seg => `
@@ -337,8 +374,108 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 6. HARMONY BALANCE METER RENDERER
+  // 6. 24-HOUR HOURLY TIMELINE & HEATMAP RENDERER
   // ==========================================================================
+  function renderHourlyTimeline(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const r = getActiveRoutine();
+
+    // Map 24 hours (0 to 23)
+    let slotsHTML = '';
+    for (let h = 0; h < 24; h++) {
+      let slotClass = 'time-slot-free';
+      let title = `Fascia ${h}:00 - ${h+1}:00 -> 🎉 TEMPO LIBERO INTENZIONALE`;
+
+      if (h < 7 || h >= 23) {
+        slotClass = 'time-slot-sleep';
+        title = `Fascia ${h}:00 - ${h+1}:00 -> 🌙 Sonno & Riposo`;
+      } else if (h >= 8 && h < 17) {
+        slotClass = 'time-slot-locked';
+        title = `Fascia ${h}:00 - ${h+1}:00 -> 💼 Lavoro / Studio / Commute`;
+      } else if (h === 17) {
+        slotClass = 'time-slot-social';
+        title = `Fascia ${h}:00 - ${h+1}:00 -> 📱 Social Media (Tempo Residuo)`;
+      }
+
+      slotsHTML += `<div class="time-slot-hour ${slotClass}" title="${title}"></div>`;
+    }
+
+    container.innerHTML = slotsHTML;
+  }
+
+  // ==========================================================================
+  // 7. WEEKLY 7-DAYS OVERVIEW RENDERER
+  // ==========================================================================
+  function renderWeeklyOverview() {
+    const grid = document.getElementById('weeklyDaysGrid');
+    if (!grid) return;
+
+    const days = [
+      { name: 'Lunedì', isWeekend: false, freeHours: 4.5 },
+      { name: 'Martedì', isWeekend: false, freeHours: 4.5 },
+      { name: 'Mercoledì', isWeekend: false, freeHours: 5.0 },
+      { name: 'Giovedì', isWeekend: false, freeHours: 4.5 },
+      { name: 'Venerdì', isWeekend: false, freeHours: 6.0 },
+      { name: 'Sabato', isWeekend: true, freeHours: 8.5 },
+      { name: 'Domenica', isWeekend: true, freeHours: 9.0 }
+    ];
+
+    grid.innerHTML = days.map(d => `
+      <div class="weekly-day-card ${d.isWeekend ? 'active-day' : ''}">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong style="font-size: 0.95rem;">${d.name}</strong>
+          <span style="font-size: 0.75rem; color: ${d.isWeekend ? 'var(--accent-emerald)' : 'var(--text-muted)'};">
+            ${d.isWeekend ? 'Weekend' : 'Feriale'}
+          </span>
+        </div>
+        <div class="day-progress-bar">
+          <div class="day-fill-free" style="width: ${(d.freeHours / 12) * 100}%;"></div>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 700; font-family: var(--font-heading);">
+          ${d.freeHours.toFixed(1)}h Libere
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ==========================================================================
+  // 8. RELATIONAL GOALS TRACKER RENDERER
+  // ==========================================================================
+  function renderRelationalGoals() {
+    const grid = document.getElementById('relationalGoalsGrid');
+    if (!grid) return;
+
+    grid.innerHTML = state.relationalGoals.map(rel => `
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 183, 3, 0.3); padding: 1rem; border-radius: var(--radius-md); display: flex; align-items: center; gap: 0.85rem;">
+        <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--grad-relations); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; flex-shrink: 0;">
+          <i class="fa-solid ${rel.icon || 'fa-heart'}"></i>
+        </div>
+        <div>
+          <h5 style="font-size: 0.9rem; font-weight: 600; color: #fff;">${rel.title}</h5>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">${rel.date} • ${rel.hours}h dedicate</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('btnAddRelationGoal')?.addEventListener('click', () => {
+    const title = prompt('Nome del programma relazionale (es. Cena con Marco, Chiamata Mamma):');
+    if (title) {
+      state.relationalGoals.push({
+        id: Date.now().toString(),
+        title,
+        date: 'Prossimamente',
+        hours: 1.5,
+        category: 'relations',
+        icon: 'fa-user-group'
+      });
+      saveState();
+    }
+  });
+
+  // HARMONY & CHECKLIST
   function renderHarmonyBar() {
     const harmonyBar = document.getElementById('harmonyBar');
     if (!harmonyBar) return;
@@ -379,9 +516,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ==========================================================================
-  // 7. DAILY ACTION CHECKLIST RENDERER
-  // ==========================================================================
   function renderDailyChecklist() {
     const container = document.getElementById('dailyChecklist');
     if (!container) return;
@@ -415,19 +549,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ==========================================================================
-  // 8. SOCIAL DETOX CALCULATOR SHOWCASE RENDERER
-  // ==========================================================================
   function renderDetoxShowcase() {
     const metrics = calculateMetrics();
-
     const weeklyHours = metrics.reclaimedSocialHours * 7;
     const monthHours = metrics.reclaimedSocialHours * 30;
     const yearHours = metrics.reclaimedSocialHours * 365;
 
     const booksYear = Math.round(yearHours / 25);
 
-    // Dashboard detox widget
     const detoxWeeklyHours = document.getElementById('detoxWeeklyHours');
     if (detoxWeeklyHours) detoxWeeklyHours.textContent = `${weeklyHours.toFixed(1)} h`;
 
@@ -440,7 +569,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const detoxRelationsEquiv = document.getElementById('detoxRelationsEquiv');
     if (detoxRelationsEquiv) detoxRelationsEquiv.textContent = `+${weeklyHours.toFixed(0)} Ore Reali`;
 
-    // Full Detox View
     const detoxMonthHours = document.getElementById('detoxMonthHours');
     if (detoxMonthHours) detoxMonthHours.textContent = `${monthHours.toFixed(0)} Ore`;
 
@@ -457,9 +585,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (detoxSocialYear) detoxSocialYear.textContent = `+${Math.round(yearHours / 4)} Uscite Reali`;
   }
 
-  // ==========================================================================
-  // 9. TIME BANK & CUSTOM ACTIVITIES RENDERER
-  // ==========================================================================
   function renderCustomActivities() {
     const grid = document.getElementById('customActivitiesGrid');
     if (!grid) return;
@@ -492,9 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
     switchTab('dashboard');
   };
 
-  // ==========================================================================
-  // 10. VISION & MANIFESTO MODAL CONTROLLER
-  // ==========================================================================
+  // MODALS
   const visionModal = document.getElementById('visionModal');
   const openVisionModal = document.getElementById('openVisionModal');
   const btnCloseVisionModal = document.getElementById('btnCloseVisionModal');
@@ -502,9 +625,6 @@ document.addEventListener('DOMContentLoaded', () => {
   openVisionModal?.addEventListener('click', () => visionModal.classList.add('open'));
   btnCloseVisionModal?.addEventListener('click', () => visionModal.classList.remove('open'));
 
-  // ==========================================================================
-  // 11. AUTHENTICATION & MODAL CONTROLLERS
-  // ==========================================================================
   const authModal = document.getElementById('authModal');
   const openAuthModal = document.getElementById('openAuthModal');
   const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
@@ -539,7 +659,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnCloseAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
 
-  // Switch Auth Tabs
   tabAuthLogin?.addEventListener('click', () => {
     hideAuthStatus();
     tabAuthLogin.classList.add('active');
@@ -574,7 +693,6 @@ document.addEventListener('DOMContentLoaded', () => {
     tabAuthLogin.click();
   });
 
-  // SUBMIT 1: LOGIN
   formLogin?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -604,7 +722,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // SUBMIT 2: REGISTRATION
   formRegister?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -628,7 +745,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // SUBMIT 3: PASSWORD RECOVERY VIA EMAIL
   formForgotPassword?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -643,7 +759,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Save Credentials Config Button
   document.getElementById('btnSaveSbKeys')?.addEventListener('click', () => {
     const url = document.getElementById('sbUrlInput').value.trim();
     const key = document.getElementById('sbKeyInput').value.trim();
@@ -654,7 +769,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Listen to Supabase Auth Changes
   if (window.TimeReclaimSupabase) {
     window.TimeReclaimSupabase.onAuthStateChange(async (event, session) => {
       if (session?.user) {
@@ -665,7 +779,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Add Activity Modal
   const addActivityModal = document.getElementById('addActivityModal');
   const btnOpenAddActivity = document.getElementById('btnOpenAddActivity');
   const btnCloseAddActivityModal = document.getElementById('btnCloseAddActivityModal');
@@ -697,13 +810,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // 12. GLOBAL RENDER ALL FUNCTION
   // ==========================================================================
   function renderAll() {
-    // Nav Profile update
+    const r = getActiveRoutine();
+
     const navAvatar = document.getElementById('navAvatar');
     const navUserName = document.getElementById('navUserName');
     if (navAvatar) navAvatar.textContent = state.user.avatar || 'TR';
     if (navUserName) navUserName.textContent = state.user.firstName ? `${state.user.firstName} ${state.user.lastName}` : 'Accedi / Registrati';
 
-    // Metrics
     const metrics = calculateMetrics();
     const statAwakeHours = document.getElementById('statAwakeHours');
     if (statAwakeHours) statAwakeHours.textContent = `${metrics.awakeHours.toFixed(1)} h`;
@@ -715,23 +828,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (statRelationScore) statRelationScore.textContent = `${metrics.relationScore}%`;
 
     // Sliders sync
-    if (sleepHoursInput) sleepHoursInput.value = state.routine.sleepHours;
-    if (sleepHoursVal) sleepHoursVal.textContent = `${state.routine.sleepHours.toFixed(1)} Ore`;
+    if (sleepHoursInput) sleepHoursInput.value = r.sleepHours;
+    if (sleepHoursVal) sleepHoursVal.textContent = `${r.sleepHours.toFixed(1)} Ore`;
     if (step1AwakeCalc) step1AwakeCalc.textContent = `${metrics.awakeHours.toFixed(1)} Ore / Giorno`;
 
-    if (workHoursInput) workHoursInput.value = state.routine.workHours;
-    if (commuteHoursInput) commuteHoursInput.value = state.routine.commuteHours;
-    if (choresHoursInput) choresHoursInput.value = state.routine.choresHours;
-    document.getElementById('workHoursVal').textContent = `${state.routine.workHours.toFixed(1)} Ore`;
-    document.getElementById('commuteHoursVal').textContent = `${state.routine.commuteHours.toFixed(1)} Ore`;
-    document.getElementById('choresHoursVal').textContent = `${state.routine.choresHours.toFixed(1)} Ore`;
+    if (workHoursInput) workHoursInput.value = r.workHours;
+    if (commuteHoursInput) commuteHoursInput.value = r.commuteHours;
+    if (choresHoursInput) choresHoursInput.value = r.choresHours;
+    document.getElementById('workHoursVal').textContent = `${r.workHours.toFixed(1)} Ore`;
+    document.getElementById('commuteHoursVal').textContent = `${r.commuteHours.toFixed(1)} Ore`;
+    document.getElementById('choresHoursVal').textContent = `${r.choresHours.toFixed(1)} Ore`;
     if (step2RawCalc) step2RawCalc.textContent = `${metrics.totalIntentionalBudget.toFixed(1)} Ore / Giorno`;
 
-    if (socialWasteInput) socialWasteInput.value = state.routine.socialWasteHours;
-    if (socialWasteVal) socialWasteVal.textContent = `${state.routine.socialWasteHours.toFixed(1)} Ore/giorno`;
+    if (socialWasteInput) socialWasteInput.value = r.socialWasteHours;
+    if (socialWasteVal) socialWasteVal.textContent = `${r.socialWasteHours.toFixed(1)} Ore/giorno`;
     if (step3ReclaimedCalc) step3ReclaimedCalc.textContent = `+${metrics.reclaimedSocialHours.toFixed(1)} Ore Riconquistate!`;
 
-    // Allocations sliders
     Object.keys(state.allocations).forEach(k => {
       const inp = document.getElementById(`alloc${k.charAt(0).toUpperCase() + k.slice(1)}Input`);
       const val = document.getElementById(`alloc${k.charAt(0).toUpperCase() + k.slice(1)}Val`);
@@ -748,6 +860,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDailyChecklist();
     renderDetoxShowcase();
     renderCustomActivities();
+    renderHourlyTimeline('dashboardHourlyGrid');
+    renderHourlyTimeline('fullWeeklyHourlyGrid');
+    renderWeeklyOverview();
+    renderRelationalGoals();
   }
 
   // Initial Boot Render

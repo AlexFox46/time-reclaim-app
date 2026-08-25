@@ -47,6 +47,9 @@
           <button class="nav-btn active" data-tab="dashboard">
             <i class="fa-solid fa-chart-pie"></i> Dashboard
           </button>
+          <button class="nav-btn" data-tab="weekly">
+            <i class="fa-solid fa-calendar-week"></i> Settimana & Timeline
+          </button>
           <button class="nav-btn" data-tab="wizard">
             <i class="fa-solid fa-wand-magic-sparkles"></i> Setup Routine
           </button>
@@ -107,6 +110,29 @@
               <h3 id="statRelationScore">85%</h3>
               <p>Indice Connessioni & Vita</p>
             </div>
+          </div>
+        </div>
+
+        <!-- Hourly Timeline Preview Banner on Dashboard -->
+        <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1.25rem 1.75rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <h4 style="font-family: var(--font-heading); font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fa-solid fa-timeline" style="color: var(--accent-cyan);"></i>
+              Fasce Orarie Libere Oggi (Timeline 00-24)
+            </h4>
+            <span class="badge badge-cyan" id="bestFreeTimeSlotBadge">Fascia migliore: 18:00 - 21:00</span>
+          </div>
+
+          <div class="timeline-24h-grid" id="dashboardHourlyGrid">
+            <!-- 24 Hourly blocks rendered dynamically -->
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+            <span>00:00 Notte</span>
+            <span>06:00 Risveglio</span>
+            <span>12:00 Pomeriggio</span>
+            <span>18:00 Sera</span>
+            <span>23:00 Notte</span>
           </div>
         </div>
 
@@ -234,6 +260,93 @@
           </div>
         </div>
 
+      </section>
+
+      <!-- ==========================================
+           VIEW 5: VISTA SETTIMANALE & FASCE ORARIE (NEW)
+           ========================================== -->
+      <section id="view-weekly" class="view-section">
+        <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+          
+          <!-- Header Preset Selector -->
+          <div class="glass-card">
+            <div class="card-header" style="margin-bottom: 0;">
+              <div>
+                <h2 class="card-title">
+                  <i class="fa-solid fa-calendar-week" style="color: var(--accent-cyan);"></i>
+                  Routine Settimanale & Fasce Orarie
+                </h2>
+                <p class="card-subtitle">Confronta la tua disponibilità giorno per giorno e scopri quando sei più libero</p>
+              </div>
+
+              <!-- Preset Toggle Switch -->
+              <div class="nav-tabs">
+                <button class="nav-btn active" id="btnPresetFeriale">💼 Feriale (Lun-Ven)</button>
+                <button class="nav-btn" id="btnPresetFestivo">🎉 Festivo (Sab-Dom)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7-Days Weekly Availability Grid -->
+          <div class="glass-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fa-solid fa-chart-bar" style="color: var(--accent-emerald);"></i>
+                Panoramica Giorno per Giorno (Lunedì - Domenica)
+              </h3>
+              <span class="badge badge-emerald">Media Libera: 4.8h / giorno</span>
+            </div>
+
+            <div class="weekly-days-grid" id="weeklyDaysGrid">
+              <!-- Rendered dynamically via JS -->
+            </div>
+          </div>
+
+          <!-- Detailed Hourly Time Slots Heatmap Breakdown -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i class="fa-solid fa-clock" style="color: var(--accent-amber);"></i>
+                  Heatmap delle Fasce Orarie Libere
+                </h3>
+                <p class="card-subtitle">Passa con il mouse sulle ore per vedere cosa hai programmato in quella fascia</p>
+              </div>
+            </div>
+
+            <div class="timeline-24h-grid" id="fullWeeklyHourlyGrid" style="height: 60px;">
+              <!-- 24 Interactive slots rendered dynamically -->
+            </div>
+
+            <div style="display: flex; justify-content: space-around; font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+              <span><i class="fa-solid fa-square" style="color: rgba(142, 45, 226, 0.7);"></i> 00:00 - 07:00 (Sonno)</span>
+              <span><i class="fa-solid fa-square" style="color: rgba(59, 130, 246, 0.7);"></i> 08:00 - 17:00 (Lavoro & Commute)</span>
+              <span><i class="fa-solid fa-square" style="color: rgba(255, 0, 127, 0.8);"></i> 17:00 - 18:00 (Social Residuo)</span>
+              <span><i class="fa-solid fa-square" style="color: var(--accent-cyan);"></i> 18:00 - 23:00 (Fascia Libera Intenzionale!)</span>
+            </div>
+          </div>
+
+          <!-- Relational Goals Tracker Widget -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i class="fa-solid fa-user-group" style="color: var(--accent-pink);"></i>
+                  Relazioni & Incontri Reali Programmati
+                </h3>
+                <p class="card-subtitle">Usa il tempo riconquistato per coltivare le tue relazioni vere</p>
+              </div>
+              <button class="btn-glass btn-sm btn-primary" id="btnAddRelationGoal">
+                <i class="fa-solid fa-plus"></i> Programma Incontro
+              </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem;" id="relationalGoalsGrid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
       </section>
 
       <!-- ==========================================
