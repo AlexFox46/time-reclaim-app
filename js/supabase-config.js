@@ -6,15 +6,15 @@
 window.TimeReclaimSupabase = (function () {
   let supabaseClient = null;
 
-  // URL del progetto Supabase dell'utente
+  // URL e Publishable / Anon Key ufficiali del progetto Supabase
   const SUPABASE_URL = localStorage.getItem('supabase_url') || 'https://dqjugoaktxcyddadxxka.supabase.co';
-  const SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key') || '';
+  const SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key') || 'sb_publishable_4Zhb7h_1oc7h4kZLHUe4rA_aaqPha3N';
 
   function initClient() {
     if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
       try {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Client Supabase Cloud connesso a:', SUPABASE_URL);
+        console.log('Client Supabase Cloud connesso con successo a:', SUPABASE_URL);
         return true;
       } catch (e) {
         console.warn('Inizializzazione Supabase non riuscita (utilizziamo il fallback locale):', e);
@@ -26,10 +26,10 @@ window.TimeReclaimSupabase = (function () {
   initClient();
 
   return {
-    isConfigured: () => !!supabaseClient && !!SUPABASE_ANON_KEY,
+    isConfigured: () => !!supabaseClient,
     getProjectUrl: () => SUPABASE_URL,
     
-    // Imposta le credenziali reali del tuo progetto Supabase (URL & Anon Key)
+    // Imposta le credenziali del progetto Supabase (URL & Key)
     setCredentials(url, key) {
       if (url && key) {
         localStorage.setItem('supabase_url', url);
@@ -40,8 +40,8 @@ window.TimeReclaimSupabase = (function () {
 
     // SignUp (Nome, Cognome, Email, Password)
     async signUpUser({ firstName, lastName, email, password }) {
-      if (!supabaseClient || !SUPABASE_ANON_KEY) {
-        console.log('Utilizzo Auth Locale per la registrazione (in attesa di Anon Key).');
+      if (!supabaseClient) {
+        console.log('Utilizzo Auth Locale per la registrazione.');
         const localUser = {
           id: 'usr_' + Date.now(),
           email: email,
@@ -80,7 +80,7 @@ window.TimeReclaimSupabase = (function () {
 
     // SignIn (Email, Password)
     async signInUser({ email, password }) {
-      if (!supabaseClient || !SUPABASE_ANON_KEY) {
+      if (!supabaseClient) {
         console.log('Utilizzo Auth Locale per l\'accesso.');
         return { user: { id: 'usr_local', email } };
       }
@@ -104,7 +104,7 @@ window.TimeReclaimSupabase = (function () {
 
     // Password Reset Email
     async sendPasswordReset(email) {
-      if (!supabaseClient || !SUPABASE_ANON_KEY) {
+      if (!supabaseClient) {
         return { message: 'Email di reset inviata con successo!' };
       }
 
