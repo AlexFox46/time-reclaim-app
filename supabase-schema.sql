@@ -1,127 +1,89 @@
 -- ==========================================================================
--- TIME RECLAIM - SUPABASE AUTH & DATABASE SCHEMA (PROFILES + RLS)
--- Esegui questo script nell'Editor SQL del tuo progetto Supabase
+-- TIME RECLAIM - POSTGRESQL DATABASE SCHEMA (SUPABASE)
 -- ==========================================================================
 
--- 1. Tabella Profili Utente (Collegata direttamente ad auth.users)
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- 1. PROFILES TABLE
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  avatar TEXT NOT NULL DEFAULT 'TR',
-  motivation TEXT DEFAULT 'Coltivare le mie relazioni ed eliminare il tempo perso sui social',
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+  email TEXT UNIQUE NOT NULL,
+  first_name TEXT,
+  last_name TEXT,
+  avatar TEXT,
+  wake_time TIME DEFAULT '07:00',
+  sleep_time TIME DEFAULT '23:00',
+  free_time_goal_minutes INT DEFAULT 180,
+  onboarding_completed BOOLEAN DEFAULT FALSE,
+  google_calendar_linked BOOLEAN DEFAULT FALSE,
+  notify_streaks BOOLEAN DEFAULT TRUE,
+  notify_weekly BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. Tabella Routine (Sonno, Veglia, Bloccati, Social)
+-- 2. ACTIVITIES TABLE
+CREATE TABLE IF NOT EXISTS public.activities (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  tag TEXT DEFAULT 'tempo_libero', -- 'tempo_libero' or 'dovere'
+  duration_minutes INT DEFAULT 60,
+  start_time TIMESTAMP WITH TIME ZONE,
+  end_time TIMESTAMP WITH TIME ZONE,
+  is_recurring BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 3. ROUTINES TABLE
 CREATE TABLE IF NOT EXISTS public.routines (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
-  sleep_hours NUMERIC(3,1) DEFAULT 8.0,
-  wake_time TEXT DEFAULT '07:00',
-  sleep_time TEXT DEFAULT '23:00',
-  work_hours NUMERIC(3,1) DEFAULT 8.0,
-  commute_hours NUMERIC(3,1) DEFAULT 1.0,
-  chores_hours NUMERIC(3,1) DEFAULT 2.5,
-  social_waste_hours NUMERIC(3,1) DEFAULT 3.0,
-  detox_percent NUMERIC(3,2) DEFAULT 0.70,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
-);
-
--- 3. Tabella Allocazione Tempo Intenzionale
-CREATE TABLE IF NOT EXISTS public.allocations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
-  productive NUMERIC(3,2) DEFAULT 1.50,
-  fitness NUMERIC(3,2) DEFAULT 1.00,
-  cinema NUMERIC(3,2) DEFAULT 1.50,
-  relations NUMERIC(3,2) DEFAULT 1.50,
-  boredom NUMERIC(3,2) DEFAULT 1.00,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
-);
-
--- 4. Tabella Attività Personalizzate (Banca del Tempo)
-CREATE TABLE IF NOT EXISTS public.custom_activities (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
-  category TEXT NOT NULL,
-  duration NUMERIC(3,2) NOT NULL DEFAULT 1.0,
-  icon TEXT DEFAULT 'fa-star',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+  moment TEXT NOT NULL, -- 'mattina', 'lavoro', 'sera'
+  is_active BOOLEAN DEFAULT TRUE,
+  start_time TIME,
+  end_time TIME,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 5. Tabella Checklist Quotidiana
-CREATE TABLE IF NOT EXISTS public.daily_checklist (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  duration TEXT NOT NULL,
-  category TEXT NOT NULL,
-  completed BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
-);
+-- ROW LEVEL SECURITY (RLS) POLICIES
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.routines ENABLE ROW LEVEL SECURITY;
 
--- ==========================================================================
--- TRIGGER PER CREAZIONE AUTOMATICA PROFILO ALLA REGISTRAZIONE AUTH
--- ==========================================================================
+-- Profiles Policies
+CREATE POLICY "Users can view their own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can insert their own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Activities Policies
+CREATE POLICY "Users can view their own activities" ON public.activities FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage their own activities" ON public.activities FOR ALL USING (auth.uid() = user_id);
+
+-- Routines Policies
+CREATE POLICY "Users can view their own routines" ON public.routines FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage their own routines" ON public.routines FOR ALL USING (auth.uid() = user_id);
+
+-- AUTOMATIC PROFILE TRIGGER ON AUTH USER CREATION
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, first_name, last_name, email, avatar)
+  INSERT INTO public.profiles (id, email, first_name, last_name, avatar)
   VALUES (
-    new.id,
-    COALESCE(new.raw_user_meta_data->>'first_name', 'Utente'),
-    COALESCE(new.raw_user_meta_data->>'last_name', 'TimeReclaim'),
-    new.email,
-    UPPER(SUBSTRING(COALESCE(new.raw_user_meta_data->>'first_name', 'U'), 1, 1) || SUBSTRING(COALESCE(new.raw_user_meta_data->>'last_name', 'T'), 1, 1))
-  );
-
-  -- Crea anche record di default per routine ed allocazioni
-  INSERT INTO public.routines (user_id) VALUES (new.id) ON CONFLICT (user_id) DO NOTHING;
-  INSERT INTO public.allocations (user_id) VALUES (new.id) ON CONFLICT (user_id) DO NOTHING;
-
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'first_name', 'Utente'),
+    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+    UPPER(SUBSTRING(COALESCE(NEW.raw_user_meta_data->>'first_name', 'TR'), 1, 1) || SUBSTRING(COALESCE(NEW.raw_user_meta_data->>'last_name', ''), 1, 1))
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger agganciato ad auth.users
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- ==========================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
--- ==========================================================================
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.routines ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.allocations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.custom_activities ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.daily_checklist ENABLE ROW LEVEL SECURITY;
-
--- Profiles Policy
-DROP POLICY IF EXISTS "Users can view and edit own profile" ON public.profiles;
-CREATE POLICY "Users can view and edit own profile" ON public.profiles
-  FOR ALL USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
-
--- Routines Policy
-DROP POLICY IF EXISTS "Users can view and edit own routine" ON public.routines;
-CREATE POLICY "Users can view and edit own routine" ON public.routines
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
--- Allocations Policy
-DROP POLICY IF EXISTS "Users can view and edit own allocations" ON public.allocations;
-CREATE POLICY "Users can view and edit own allocations" ON public.allocations
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
--- Custom Activities Policy
-DROP POLICY IF EXISTS "Users can manage own custom activities" ON public.custom_activities;
-CREATE POLICY "Users can manage own custom activities" ON public.custom_activities
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
--- Daily Checklist Policy
-DROP POLICY IF EXISTS "Users can manage own daily checklist" ON public.daily_checklist;
-CREATE POLICY "Users can manage own daily checklist" ON public.daily_checklist
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);

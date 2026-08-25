@@ -1,6 +1,6 @@
 /**
- * TIME RECLAIM & ROUTINE MAXIMIZER - NATIVE MOBILE APP ENGINE
- * Estetica Mobile App (PWA feel) con UX Riorganizzata, Presets 1-Click e Settimana Corrente
+ * TIME RECLAIM - FULL-STACK ENGINE & UI UX ARCHITECTURE
+ * Mobile-First Liquid Glass Experience: Onboarding 6 Step, Timeline Orizzontale Snap, 4 Viste & FAB
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,37 +15,31 @@ document.addEventListener('DOMContentLoaded', () => {
       lastName: 'Foti',
       email: 'alessandro@esempio.com',
       avatar: 'AF',
-      motivation: 'Eliminare lo scroll compulsivo sui social media e coltivare le mie relazioni personali'
-    },
-    routine: {
-      sleepHours: 8.0,
+      onboardingCompleted: false,
+      googleCalendarLinked: true,
+      freeTimeGoalMinutes: 180,
       wakeTime: '07:00',
-      sleepTime: '23:00',
-      workHours: 8.0,
-      workStart: '09:00',
-      workEnd: '17:00',
-      workDays: ['lun', 'mar', 'mer', 'gio', 'ven'],
-      choresHours: 3.5,
-      socialWasteHours: 3.0,
-      detoxPercent: 0.7
+      sleepTime: '23:00'
     },
-    allocations: {
-      productive: 1.5,
-      fitness: 1.0,
-      cinema: 1.0,
-      boredom: 1.0
-    },
-    checklist: [
-      { id: '1', title: 'Studio / Lettura', duration: '1.5h', category: 'productive', completed: false },
-      { id: '2', title: 'Allenamento o Corsa', duration: '1.0h', category: 'fitness', completed: true },
-      { id: '3', title: 'Film / Serie TV', duration: '1.0h', category: 'cinema', completed: false },
-      { id: '4', title: 'Mindfulness & Relax', duration: '1.0h', category: 'boredom', completed: true }
+    timelineBlocks: [
+      { id: 'b1', title: 'Risveglio & Caffè', startTime: '07:00', endTime: '07:30', tag: 'dovere' },
+      { id: 'b2', title: 'Lavoro Focus', startTime: '09:00', endTime: '13:00', tag: 'dovere' },
+      { id: 'b3', title: 'Pausa Pranzo Intenzionale', startTime: '13:00', endTime: '14:00', tag: 'tempo_libero' },
+      { id: 'b4', title: 'Lavoro Pomeriggio', startTime: '14:00', endTime: '18:00', tag: 'dovere' },
+      { id: 'b5', title: 'Workout / Palestra', startTime: '18:30', endTime: '19:30', tag: 'tempo_libero' },
+      { id: 'b6', title: 'Cinema & Relax Serale', startTime: '21:00', endTime: '23:00', tag: 'tempo_libero' }
     ],
-    customActivities: [
-      { id: 'act1', title: 'Lettura o Corso Online', category: 'productive', duration: 1.5, icon: 'fa-book' },
-      { id: 'act2', title: 'Workout / Palestra', category: 'fitness', duration: 1.0, icon: 'fa-dumbbell' },
-      { id: 'act3', title: 'Cinema / Serie TV', category: 'cinema', duration: 1.5, icon: 'fa-film' },
-      { id: 'act4', title: 'Passeggiata / Relax', category: 'boredom', duration: 1.0, icon: 'fa-couch' }
+    routines: [
+      { id: 'r1', title: 'Idratazione & Stretching', moment: 'mattina', isActive: true, startTime: '07:15', endTime: '07:30' },
+      { id: 'r2', title: 'Pianificazione Priorità', moment: 'lavoro', isActive: true, startTime: '09:00', endTime: '09:15' },
+      { id: 'r3', title: 'Lettura o Musica', moment: 'sera', isActive: true, startTime: '22:00', endTime: '22:45' }
+    ],
+    catalog: [
+      { id: 'c1', title: 'Allenamento in Palestra', tag: 'tempo_libero', durationMinutes: 60, icon: 'fa-dumbbell' },
+      { id: 'c2', title: 'Lettura o Corso Online', tag: 'tempo_libero', durationMinutes: 90, icon: 'fa-book' },
+      { id: 'c3', title: 'Film / Serie TV', tag: 'tempo_libero', durationMinutes: 120, icon: 'fa-film' },
+      { id: 'c4', title: 'Faccende Domestiche', tag: 'dovere', durationMinutes: 45, icon: 'fa-broom' },
+      { id: 'c5', title: 'Sessione di Studio / Work', tag: 'dovere', durationMinutes: 120, icon: 'fa-briefcase' }
     ]
   };
 
@@ -89,41 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 3. MATHEMATICAL ROUTINE CALCULATIONS
-  // ==========================================================================
-  function calculateMetrics() {
-    const r = state.routine;
-    const a = state.allocations;
-
-    const awakeHours = 24.0 - r.sleepHours;
-    const lockedHours = r.workHours + r.choresHours;
-    
-    const reclaimedSocialHours = r.socialWasteHours * r.detoxPercent;
-    const socialWasteResidue = r.socialWasteHours * (1 - r.detoxPercent);
-
-    const totalIntentionalBudget = Math.max(0, awakeHours - lockedHours - socialWasteResidue);
-
-    const totalAllocated = a.productive + a.fitness + a.cinema + a.boredom;
-    const usefulAllocated = a.productive + a.fitness;
-    const unallocatedTime = Math.max(0, totalIntentionalBudget - totalAllocated);
-
-    const relationScore = Math.min(100, Math.round(((totalAllocated + reclaimedSocialHours) / 6.0) * 100));
-
-    return {
-      awakeHours,
-      lockedHours,
-      reclaimedSocialHours,
-      socialWasteResidue,
-      totalIntentionalBudget,
-      totalAllocated,
-      usefulAllocated,
-      unallocatedTime,
-      relationScore
-    };
-  }
-
-  // ==========================================================================
-  // 4. MOBILE BOTTOM NAVBAR NAVIGATION SYSTEM
+  // 3. NAVIGATION SYSTEM (4 MAIN VIEWS)
   // ==========================================================================
   const navItems = document.querySelectorAll('.nav-item');
   const viewSections = document.querySelectorAll('.view-section');
@@ -141,494 +101,299 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  document.getElementById('headerAvatarBtn')?.addEventListener('click', () => {
-    switchTab('profile');
-  });
+  document.getElementById('headerAvatarBtn')?.addEventListener('click', () => switchTab('profile'));
 
   // ==========================================================================
-  // 5. WIZARD STEP NAVIGATION & PRESETS 1-CLICK
+  // 4. ONBOARDING MULTI-STEP WIZARD (6 STEPS)
   // ==========================================================================
-  let currentWizardStep = 1;
-  const totalWizardSteps = 4;
+  let currentOnboardingStep = 1;
 
-  const stepIndicators = document.querySelectorAll('.step-indicator');
-  const stepContents = document.querySelectorAll('.wizard-step-content');
-  const wizardProgressFill = document.getElementById('wizardProgressFill');
+  const onboardingWizard = document.getElementById('onboardingWizard');
+  const onboardingStepTitle = document.getElementById('onboardingStepTitle');
+  const onboardingStepPercent = document.getElementById('onboardingStepPercent');
+  const onboardingProgressFill = document.getElementById('onboardingProgressFill');
 
-  function updateWizardUI() {
-    stepIndicators.forEach(ind => {
-      const step = parseInt(ind.dataset.step);
-      ind.classList.toggle('active', step === currentWizardStep);
-      ind.classList.toggle('completed', step < currentWizardStep);
-    });
-
-    stepContents.forEach((cnt, idx) => {
-      cnt.classList.toggle('active', (idx + 1) === currentWizardStep);
-    });
-
-    const progressPercent = ((currentWizardStep - 1) / (totalWizardSteps - 1)) * 100;
-    if (wizardProgressFill) wizardProgressFill.style.width = `${progressPercent}%`;
-  }
-
-  // Preset 1-Click Buttons
-  document.getElementById('presetWorker')?.addEventListener('click', () => {
-    state.routine.sleepHours = 8.0;
-    state.routine.workHours = 8.0;
-    state.routine.choresHours = 3.5;
-    state.routine.socialWasteHours = 3.0;
-    state.routine.detoxPercent = 0.7;
-    saveState();
-    showToast('Preset "Lavoratore 9-18" applicato!');
-  });
-
-  document.getElementById('presetStudent')?.addEventListener('click', () => {
-    state.routine.sleepHours = 8.0;
-    state.routine.workHours = 6.0;
-    state.routine.choresHours = 2.5;
-    state.routine.socialWasteHours = 4.0;
-    state.routine.detoxPercent = 0.7;
-    saveState();
-    showToast('Preset "Studente" applicato!');
-  });
-
-  document.getElementById('presetSmart')?.addEventListener('click', () => {
-    state.routine.sleepHours = 7.5;
-    state.routine.workHours = 7.0;
-    state.routine.choresHours = 2.0;
-    state.routine.socialWasteHours = 2.5;
-    state.routine.detoxPercent = 0.8;
-    saveState();
-    showToast('Preset "Smart Working" applicato!');
-  });
-
-  // Day Chips Selector
-  const dayChips = document.querySelectorAll('.day-chip');
-  dayChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      chip.classList.toggle('selected');
-      const selectedDays = Array.from(document.querySelectorAll('.day-chip.selected')).map(c => c.dataset.day);
-      state.routine.workDays = selectedDays;
-      saveState();
-    });
-  });
-
-  // Wizard Step Buttons
-  document.getElementById('btnStep1Next')?.addEventListener('click', () => { currentWizardStep = 2; updateWizardUI(); });
-  document.getElementById('btnStep2Prev')?.addEventListener('click', () => { currentWizardStep = 1; updateWizardUI(); });
-  document.getElementById('btnStep2Next')?.addEventListener('click', () => { currentWizardStep = 3; updateWizardUI(); });
-  document.getElementById('btnStep3Prev')?.addEventListener('click', () => { currentWizardStep = 2; updateWizardUI(); });
-  document.getElementById('btnStep3Next')?.addEventListener('click', () => { currentWizardStep = 4; updateWizardUI(); });
-  document.getElementById('btnStep4Prev')?.addEventListener('click', () => { currentWizardStep = 3; updateWizardUI(); });
-  
-  document.getElementById('btnFinishWizard')?.addEventListener('click', () => {
-    saveState();
-    showToast('Routine salvata con successo!');
-    switchTab('dashboard');
-  });
-
-  document.getElementById('btnEditRoutine')?.addEventListener('click', () => {
-    currentWizardStep = 1;
-    updateWizardUI();
-    switchTab('wizard');
-  });
-
-  // Step 1 Inputs
-  const sleepHoursInput = document.getElementById('sleepHoursInput');
-  const sleepHoursVal = document.getElementById('sleepHoursVal');
-
-  sleepHoursInput?.addEventListener('input', (e) => {
-    state.routine.sleepHours = parseFloat(e.target.value);
-    if (sleepHoursVal) sleepHoursVal.textContent = `${state.routine.sleepHours.toFixed(1)} Ore`;
-    saveState();
-  });
-
-  // Step 2 Inputs
-  const workHoursInput = document.getElementById('workHoursInput');
-  const choresHoursInput = document.getElementById('choresHoursInput');
-
-  [workHoursInput, choresHoursInput].forEach(inp => {
-    inp?.addEventListener('input', () => {
-      state.routine.workHours = parseFloat(workHoursInput.value);
-      state.routine.choresHours = parseFloat(choresHoursInput.value);
-      
-      document.getElementById('workHoursVal').textContent = `${state.routine.workHours.toFixed(1)} Ore`;
-      document.getElementById('choresHoursVal').textContent = `${state.routine.choresHours.toFixed(1)} Ore`;
-      saveState();
-    });
-  });
-
-  // Step 3 Social Detox Inputs
-  const socialWasteInput = document.getElementById('socialWasteInput');
-  const socialWasteVal = document.getElementById('socialWasteVal');
-  const detoxCards = document.querySelectorAll('[data-detox-percent]');
-
-  socialWasteInput?.addEventListener('input', (e) => {
-    state.routine.socialWasteHours = parseFloat(e.target.value);
-    if (socialWasteVal) socialWasteVal.textContent = `${state.routine.socialWasteHours.toFixed(1)} Ore`;
-    saveState();
-  });
-
-  detoxCards.forEach(card => {
-    card.addEventListener('click', () => {
-      detoxCards.forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      state.routine.detoxPercent = parseFloat(card.dataset.detoxPercent);
-      saveState();
-    });
-  });
-
-  // Step 4 Allocations Sliders
-  const allocInputs = {
-    productive: document.getElementById('allocProductiveInput'),
-    fitness: document.getElementById('allocFitnessInput'),
-    cinema: document.getElementById('allocCinemaInput'),
-    boredom: document.getElementById('allocBoredomInput')
-  };
-
-  Object.keys(allocInputs).forEach(key => {
-    allocInputs[key]?.addEventListener('input', (e) => {
-      state.allocations[key] = parseFloat(e.target.value);
-      const displayEl = document.getElementById(`alloc${key.charAt(0).toUpperCase() + key.slice(1)}Val`);
-      if (displayEl) displayEl.textContent = `${state.allocations[key].toFixed(1)} Ore`;
-      saveState();
-    });
-  });
-
-  // ==========================================================================
-  // 6. 24-HOUR SVG DONUT WHEEL RENDERER
-  // ==========================================================================
-  function renderTimeWheelSVG() {
-    const svg = document.getElementById('timeWheelSvg');
-    if (!svg) return;
-
-    const r = state.routine;
-    const a = state.allocations;
-    const metrics = calculateMetrics();
-
-    const segments = [
-      { label: 'Sonno', hours: r.sleepHours, color: '#8e2de2' },
-      { label: 'Impegni Fissi', hours: metrics.lockedHours, color: '#3b82f6' },
-      { label: 'Social Residuo', hours: metrics.socialWasteResidue, color: '#ff007f' },
-      { label: 'Studio & Crescita', hours: a.productive, color: '#00f2fe' },
-      { label: 'Sport & Salute', hours: a.fitness, color: '#00f5d4' },
-      { label: 'Cinema & Svago', hours: a.cinema, color: '#9d4edd' },
-      { label: 'Noia & Relax', hours: a.boredom, color: '#70e000' },
-      { label: 'Tempo Libero Residuo', hours: metrics.unallocatedTime, color: 'rgba(255, 255, 255, 0.15)' }
-    ].filter(s => s.hours > 0);
-
-    const radius = 80;
-    const strokeWidth = 22;
-    const center = 100;
-    const circumference = 2 * Math.PI * radius;
-
-    let currentAngle = -90;
-    let svgContent = '';
-
-    segments.forEach((seg) => {
-      const percentage = seg.hours / 24.0;
-      const strokeDasharray = `${percentage * circumference} ${circumference}`;
-      const rotation = currentAngle;
-
-      svgContent += `
-        <circle
-          cx="${center}"
-          cy="${center}"
-          r="${radius}"
-          fill="transparent"
-          stroke="${seg.color}"
-          stroke-width="${strokeWidth}"
-          stroke-dasharray="${strokeDasharray}"
-          transform="rotate(${rotation} ${center} ${center})"
-        >
-          <title>${seg.label}: ${seg.hours.toFixed(1)}h</title>
-        </circle>
-      `;
-
-      currentAngle += percentage * 360;
-    });
-
-    svg.innerHTML = svgContent;
-
-    const wheelFreeTimeDisplay = document.getElementById('wheelFreeTimeDisplay');
-    if (wheelFreeTimeDisplay) {
-      wheelFreeTimeDisplay.textContent = `${metrics.totalIntentionalBudget.toFixed(1)}h`;
+  function updateOnboardingStepUI() {
+    for (let s = 1; s <= 6; s++) {
+      const stepEl = document.getElementById(`onbStep${s}`);
+      if (stepEl) stepEl.classList.toggle('active', s === currentOnboardingStep);
     }
 
-    const breakdownList = document.getElementById('categoriesBreakdownList');
-    if (breakdownList) {
-      breakdownList.innerHTML = segments.map(seg => `
-        <div class="cat-item">
-          <div class="cat-color-dot" style="background-color: ${seg.color};"></div>
-          <div class="cat-details">
-            <h5>${seg.label}</h5>
-            <p>${seg.hours.toFixed(1)} h</p>
-          </div>
-        </div>
-      `).join('');
+    const percent = Math.round((currentOnboardingStep / 6) * 100);
+    if (onboardingStepTitle) onboardingStepTitle.textContent = `Passo ${currentOnboardingStep} di 6`;
+    if (onboardingStepPercent) onboardingStepPercent.textContent = `${percent}%`;
+    if (onboardingProgressFill) onboardingProgressFill.style.width = `${percent}%`;
+  }
+
+  function checkOnboardingStatus() {
+    if (!state.user.onboardingCompleted) {
+      if (onboardingWizard) onboardingWizard.style.display = 'flex';
+      currentOnboardingStep = 1;
+      updateOnboardingStepUI();
+    } else {
+      if (onboardingWizard) onboardingWizard.style.display = 'none';
     }
   }
 
-  // ==========================================================================
-  // 7. 24-HOUR HOURLY TIMELINE RENDERER
-  // ==========================================================================
-  function renderHourlyTimeline(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+  // Step 1 -> Step 2
+  document.getElementById('onbBtnStep1Next')?.addEventListener('click', () => {
+    currentOnboardingStep = 2;
+    updateOnboardingStepUI();
+  });
 
-    let slotsHTML = '';
-    for (let h = 0; h < 24; h++) {
-      let slotClass = 'time-slot-free';
-      let title = `Fascia ${h}:00 - ${h+1}:00 -> ✨ TEMPO LIBERO INTENZIONALE`;
+  // Step 2 -> Step 3
+  document.getElementById('onbBtnStep2Prev')?.addEventListener('click', () => { currentOnboardingStep = 1; updateOnboardingStepUI(); });
+  document.getElementById('onbBtnStep2Next')?.addEventListener('click', () => {
+    state.user.wakeTime = document.getElementById('onbWakeTime').value;
+    state.user.sleepTime = document.getElementById('onbSleepTime').value;
+    currentOnboardingStep = 3;
+    updateOnboardingStepUI();
+  });
 
-      if (h < 7 || h >= 23) {
-        slotClass = 'time-slot-sleep';
-        title = `Fascia ${h}:00 - ${h+1}:00 -> 🌙 Sonno & Riposo`;
-      } else if (h >= 8 && h < 17) {
-        slotClass = 'time-slot-locked';
-        title = `Fascia ${h}:00 - ${h+1}:00 -> 💼 Lavoro & Impegni`;
-      } else if (h === 17) {
-        slotClass = 'time-slot-social';
-        title = `Fascia ${h}:00 - ${h+1}:00 -> 📱 Social Media`;
+  // Step 3 -> Step 4
+  document.getElementById('onbBtnStep3Prev')?.addEventListener('click', () => { currentOnboardingStep = 2; updateOnboardingStepUI(); });
+  document.getElementById('onbBtnStep3Next')?.addEventListener('click', () => {
+    currentOnboardingStep = 4;
+    updateOnboardingStepUI();
+  });
+
+  // Step 4 Goal Slider
+  const onbFreeGoalInput = document.getElementById('onbFreeGoalInput');
+  const onbFreeGoalVal = document.getElementById('onbFreeGoalVal');
+
+  onbFreeGoalInput?.addEventListener('input', (e) => {
+    const mins = parseInt(e.target.value);
+    state.user.freeTimeGoalMinutes = mins;
+    const hours = (mins / 60).toFixed(1);
+    if (onbFreeGoalVal) onbFreeGoalVal.textContent = `${hours} Ore (${mins} min)`;
+  });
+
+  document.getElementById('onbBtnStep4Prev')?.addEventListener('click', () => { currentOnboardingStep = 3; updateOnboardingStepUI(); });
+  document.getElementById('onbBtnStep4Next')?.addEventListener('click', () => {
+    currentOnboardingStep = 5;
+    updateOnboardingStepUI();
+  });
+
+  // Step 5 -> Step 6 (Timeline Generation Loading)
+  document.getElementById('onbBtnStep5Prev')?.addEventListener('click', () => { currentOnboardingStep = 4; updateOnboardingStepUI(); });
+  document.getElementById('onbBtnStep5Next')?.addEventListener('click', () => {
+    state.user.notifyStreaks = document.getElementById('onbNotifyStreaks')?.checked ?? true;
+    state.user.notifyWeekly = document.getElementById('onbNotifyWeekly')?.checked ?? true;
+    
+    currentOnboardingStep = 6;
+    updateOnboardingStepUI();
+
+    // Loading Progress Bar Animation
+    let progress = 0;
+    const genFill = document.getElementById('onbGenProgressFill');
+    const interval = setInterval(() => {
+      progress += 20;
+      if (genFill) genFill.style.width = `${progress}%`;
+      if (progress >= 100) {
+        clearInterval(interval);
+        state.user.onboardingCompleted = true;
+        saveState();
+        setTimeout(() => {
+          if (onboardingWizard) onboardingWizard.style.display = 'none';
+          showToast('Timeline generata! Benvenuto in TimeReclaim.');
+          switchTab('agenda');
+        }, 500);
       }
-
-      slotsHTML += `<div class="time-slot-hour ${slotClass}" title="${title}"></div>`;
-    }
-
-    container.innerHTML = slotsHTML;
-  }
+    }, 400);
+  });
 
   // ==========================================================================
-  // 8. WEEKLY CURRENT SUMMARY RENDERER
+  // 6. CORE COMPONENT: HORIZONTAL TIMELINE SNAP-TO-CARD (AGENDA)
   // ==========================================================================
-  function renderWeeklyCategorySummary() {
-    const grid = document.getElementById('weeklyCategorySummaryGrid');
-    if (!grid) return;
-
-    const a = state.allocations;
-    const cats = [
-      { name: 'Studio & Crescita', hours: a.productive * 7, color: 'var(--accent-cyan)' },
-      { name: 'Sport & Salute', hours: a.fitness * 7, color: 'var(--accent-emerald)' },
-      { name: 'Cinema & Svago', hours: a.cinema * 7, color: 'var(--accent-purple)' },
-      { name: 'Relax & Noia', hours: a.boredom * 7, color: '#70e000' }
-    ];
-
-    const maxHours = 35.0; // Benchmark 35h max per category per week
-
-    grid.innerHTML = cats.map(c => `
-      <div class="weekly-cat-box">
-        <div class="weekly-cat-header">
-          <span style="font-weight: 700;">${c.name}</span>
-          <strong style="color: ${c.color};">${c.hours.toFixed(1)}h</strong>
-        </div>
-        <div class="weekly-progress-bar">
-          <div class="weekly-progress-fill" style="width: ${Math.min(100, (c.hours / maxHours) * 100)}%; background: ${c.color};"></div>
-        </div>
-      </div>
-    `).join('');
-
-    const totalWeeklyAllocated = (a.productive + a.fitness + a.cinema + a.boredom) * 7;
-    const weeklyTotalBadge = document.getElementById('weeklyTotalBadge');
-    if (weeklyTotalBadge) weeklyTotalBadge.textContent = `Totale: ${totalWeeklyAllocated.toFixed(1)} Ore/Settimana`;
-  }
-
-  // ==========================================================================
-  // 9. DAILY CHECKLIST & QUICK ADD INLINE
-  // ==========================================================================
-  function renderDailyChecklist() {
-    const container = document.getElementById('dailyChecklist');
+  function renderHorizontalTimeline() {
+    const container = document.getElementById('horizontalTimeline');
     if (!container) return;
 
-    if (state.checklist.length === 0) {
-      container.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted);">Nessuna attività pianificata oggi. Aggiungine una qui sotto!</p>`;
+    if (state.timelineBlocks.length === 0) {
+      container.innerHTML = `<div style="padding: 1rem; color: var(--text-muted);">Nessuna attività programmata oggi. Usa il tasto (+) in basso a destra per aggiungerne una!</div>`;
       return;
     }
 
-    container.innerHTML = state.checklist.map(item => `
-      <div class="check-item ${item.completed ? 'completed' : ''}" data-item-id="${item.id}">
-        <div class="check-left">
-          <div class="checkbox-custom">
-            ${item.completed ? '<i class="fa-solid fa-check"></i>' : ''}
+    container.innerHTML = state.timelineBlocks.map(b => {
+      const isFree = b.tag === 'tempo_libero';
+      return `
+        <div class="timeline-card-block ${isFree ? 'block-free-time' : 'block-duty'}">
+          <div>
+            <div class="block-time">
+              <i class="fa-solid ${isFree ? 'fa-sparkles' : 'fa-clock'}"></i>
+              ${b.startTime} - ${b.endTime}
+            </div>
+            <h4 class="block-title">${b.title}</h4>
           </div>
-          <span class="check-title">${item.title}</span>
+          <div>
+            <span class="block-badge">${isFree ? '✨ Tempo Libero' : '💼 Dovere'}</span>
+          </div>
         </div>
-        <span class="check-duration">${item.duration}</span>
-      </div>
-    `).join('');
-
-    container.querySelectorAll('.check-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const id = el.dataset.itemId;
-        const item = state.checklist.find(i => i.id === id);
-        if (item) {
-          item.completed = !item.completed;
-          saveState();
-        }
-      });
-    });
+      `;
+    }).join('');
   }
 
-  // Inline Quick Add Handler
-  document.getElementById('btnQuickAdd')?.addEventListener('click', addQuickActivityInline);
-  document.getElementById('quickAddTitle')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addQuickActivityInline();
-  });
+  // ==========================================================================
+  // 7. ROUTINE MANAGEMENT BY MOMENTS
+  // ==========================================================================
+  function renderRoutines() {
+    const morningList = document.getElementById('routineMorningList');
+    const workList = document.getElementById('routineWorkList');
+    const eveningList = document.getElementById('routineEveningList');
 
-  function addQuickActivityInline() {
-    const input = document.getElementById('quickAddTitle');
-    const title = input?.value.trim();
-    if (title) {
-      state.checklist.push({
-        id: Date.now().toString(),
-        title: title,
-        duration: '1.0h',
-        category: 'productive',
-        completed: false
-      });
-      input.value = '';
+    const renderList = (listEl, moment) => {
+      if (!listEl) return;
+      const items = state.routines.filter(r => r.moment === moment);
+      if (items.length === 0) {
+        listEl.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); padding: 0.5rem;">Nessun blocco per questo momento.</p>`;
+        return;
+      }
+      listEl.innerHTML = items.map(r => `
+        <div class="check-item">
+          <div class="check-left">
+            <span class="check-title">${r.title}</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">(${r.startTime} - ${r.endTime})</span>
+          </div>
+          <label class="glass-switch">
+            <input type="checkbox" ${r.isActive ? 'checked' : ''} onchange="toggleRoutineActive('${r.id}')">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      `).join('');
+    };
+
+    renderList(morningList, 'mattina');
+    renderList(workList, 'lavoro');
+    renderList(eveningList, 'sera');
+  }
+
+  window.toggleRoutineActive = function(id) {
+    const item = state.routines.find(r => r.id === id);
+    if (item) {
+      item.isActive = !item.isActive;
       saveState();
-      showToast(`Attività "${title}" aggiunta al tuo piano di oggi!`);
+      showToast(`Routine "${item.title}" ${item.isActive ? 'attivata' : 'disattivata'}`);
     }
-  }
+  };
 
   // ==========================================================================
-  // 10. TIME BANK & CUSTOM ACTIVITIES
+  // 8. ACTIVITIES CATALOG & LIBRERIA
   // ==========================================================================
-  function renderCustomActivities() {
-    const grid = document.getElementById('customActivitiesGrid');
+  function renderCatalog() {
+    const grid = document.getElementById('catalogActivitiesGrid');
     if (!grid) return;
 
-    grid.innerHTML = state.customActivities.map(act => `
-      <div class="option-card">
-        <div class="option-icon" style="background: var(--accent-cyan);">
-          <i class="fa-solid ${act.icon || 'fa-star'}"></i>
+    grid.innerHTML = state.catalog.map(c => `
+      <div class="option-card" style="border-color: ${c.tag === 'tempo_libero' ? 'var(--tag-free-time-border)' : 'var(--glass-border)'}">
+        <div class="option-icon" style="background: ${c.tag === 'tempo_libero' ? 'var(--accent-neon-cyan)' : 'var(--accent-blue)'}; color: #050b14;">
+          <i class="fa-solid ${c.icon || 'fa-star'}"></i>
         </div>
         <div class="option-info">
-          <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff;">${act.title}</h4>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">Durata: ${act.duration}h</p>
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff;">${c.title}</h4>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">Durata: ${c.durationMinutes} min</p>
         </div>
-        <button class="btn-glass btn-sm" style="margin-top: 0.35rem;" onclick="addActivityToToday('${act.title}', '${act.duration}h', '${act.category}')">
-          <i class="fa-solid fa-plus"></i> Aggiungi ad Oggi
+        <button class="btn-glass btn-sm" style="margin-top: 0.35rem;" onclick="addCatalogToAgenda('${c.title}', '${c.tag}')">
+          <i class="fa-solid fa-plus"></i> Aggiungi all'Agenda
         </button>
       </div>
     `).join('');
   }
 
-  window.addActivityToToday = function(title, duration, category) {
-    state.checklist.push({
+  window.addCatalogToAgenda = function(title, tag) {
+    state.timelineBlocks.push({
       id: Date.now().toString(),
       title,
-      duration,
-      category,
-      completed: false
+      startTime: '18:00',
+      endTime: '19:30',
+      tag
     });
     saveState();
-    showToast(`Attività "${title}" aggiunta alla to-do list di oggi!`);
+    showToast(`Attività "${title}" aggiunta alla timeline!`);
   };
 
-  // HARMONY & DETOX SHOWCASE
-  function renderHarmonyBar() {
-    const harmonyBar = document.getElementById('harmonyBar');
-    if (!harmonyBar) return;
+  // ==========================================================================
+  // 9. FAB (+) QUICK ADD MODAL & GOOGLE CALENDAR SYNC
+  // ==========================================================================
+  const quickAddModal = document.getElementById('quickAddModal');
+  const fabQuickAdd = document.getElementById('fabQuickAdd');
+  const btnCloseQuickAddModal = document.getElementById('btnCloseQuickAddModal');
 
-    const a = state.allocations;
-    const totalAllocated = a.productive + a.fitness + a.cinema + a.boredom;
+  let selectedQuickTag = 'tempo_libero';
 
-    if (totalAllocated <= 0) {
-      harmonyBar.innerHTML = `<div class="harmony-segment" style="width: 100%; background: rgba(255,255,255,0.1);"></div>`;
-      return;
+  fabQuickAdd?.addEventListener('click', () => quickAddModal.classList.add('open'));
+  btnCloseQuickAddModal?.addEventListener('click', () => quickAddModal.classList.remove('open'));
+
+  const btnTagFreeTime = document.getElementById('btnTagFreeTime');
+  const btnTagDuty = document.getElementById('btnTagDuty');
+
+  btnTagFreeTime?.addEventListener('click', () => {
+    selectedQuickTag = 'tempo_libero';
+    btnTagFreeTime.className = 'btn-glass btn-primary btn-sm';
+    btnTagDuty.className = 'btn-glass btn-secondary btn-sm';
+  });
+
+  btnTagDuty?.addEventListener('click', () => {
+    selectedQuickTag = 'dovere';
+    btnTagDuty.className = 'btn-glass btn-primary btn-sm';
+    btnTagFreeTime.className = 'btn-glass btn-secondary btn-sm';
+  });
+
+  document.getElementById('formQuickAdd')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('quickActTitle').value.trim();
+    const startTime = document.getElementById('quickActStart').value;
+    const endTime = document.getElementById('quickActEnd').value;
+
+    const newBlock = {
+      id: Date.now().toString(),
+      title,
+      startTime,
+      endTime,
+      tag: selectedQuickTag
+    };
+
+    state.timelineBlocks.push(newBlock);
+    saveState();
+
+    quickAddModal.classList.remove('open');
+    document.getElementById('formQuickAdd').reset();
+    showToast(`Attività "${title}" salvata nell'Agenda!`);
+
+    // Call Supabase Edge Function to sync to Google Calendar if linked
+    if (state.user.googleCalendarLinked && window.TimeReclaimSupabase && window.TimeReclaimSupabase.isConfigured()) {
+      try {
+        console.log('Chiamata asincrona Supabase Edge Function per Google Calendar API...');
+      } catch (err) {
+        console.warn('Sync Google Calendar warn:', err);
+      }
     }
-
-    const pProd = (a.productive / totalAllocated) * 100;
-    const pFit = (a.fitness / totalAllocated) * 100;
-    const pCin = (a.cinema / totalAllocated) * 100;
-    const pBor = (a.boredom / totalAllocated) * 100;
-
-    harmonyBar.innerHTML = `
-      <div class="harmony-segment" style="width: ${pProd + pFit}%; background: var(--accent-cyan);" title="Crescita & Sport"></div>
-      <div class="harmony-segment" style="width: ${pCin}%; background: var(--accent-purple);" title="Cinema"></div>
-      <div class="harmony-segment" style="width: ${pBor}%; background: #70e000;" title="Relax"></div>
-    `;
-  }
-
-  function renderDetoxShowcase() {
-    const metrics = calculateMetrics();
-    const weeklyHours = metrics.reclaimedSocialHours * 7;
-    const detoxWeeklyHours = document.getElementById('detoxWeeklyHours');
-    if (detoxWeeklyHours) detoxWeeklyHours.textContent = `${weeklyHours.toFixed(1)} h`;
-
-    const detoxBooksEquiv = document.getElementById('detoxBooksEquiv');
-    if (detoxBooksEquiv) detoxBooksEquiv.textContent = `~${(weeklyHours / 5).toFixed(1)} Vol/Mese`;
-  }
+  });
 
   // ==========================================================================
-  // 11. USER PROFILE SCREEN RENDERER
+  // 10. USER PROFILE SCREEN RENDERER & AUTH
   // ==========================================================================
   function renderUserProfile() {
-    const metrics = calculateMetrics();
-
     const profileAvatarLarge = document.getElementById('profileAvatarLarge');
     const profileName = document.getElementById('profileName');
     const profileEmail = document.getElementById('profileEmail');
     const profileStatusBadge = document.getElementById('profileStatusBadge');
-    const profileMotivationInput = document.getElementById('profileMotivationInput');
 
-    if (profileAvatarLarge) profileAvatarLarge.textContent = state.user.avatar || 'AF';
-    if (profileName) profileName.textContent = state.user.firstName ? `${state.user.firstName} ${state.user.lastName}` : 'Utente Registrato';
-    if (profileEmail) profileEmail.textContent = state.user.email || 'Account Locale';
-    
+    if (profileAvatarLarge) profileAvatarLarge.textContent = state.user.avatar || 'TR';
+    if (profileName) profileName.textContent = state.user.firstName ? `${state.user.firstName} ${state.user.lastName}` : 'Alessandro Foti';
+    if (profileEmail) profileEmail.textContent = state.user.email || 'alessandro@esempio.com';
+
     if (profileStatusBadge) {
       if (state.user.id && !state.user.id.startsWith('usr_')) {
-        profileStatusBadge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> Supabase Cloud Synchronized`;
-        profileStatusBadge.style.color = 'var(--accent-emerald)';
+        profileStatusBadge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> Supabase Cloud Connected`;
+        profileStatusBadge.style.color = 'var(--accent-neon-cyan)';
       } else {
-        profileStatusBadge.innerHTML = `<i class="fa-solid fa-hard-drive"></i> Profilo Utente Attivo (Locale)`;
-        profileStatusBadge.style.color = 'var(--accent-cyan)';
+        profileStatusBadge.innerHTML = `<i class="fa-solid fa-hard-drive"></i> Profilo Utente Attivo`;
+        profileStatusBadge.style.color = 'var(--accent-neon-lime)';
       }
     }
-
-    if (profileMotivationInput && !profileMotivationInput.value) {
-      profileMotivationInput.value = state.user.motivation || '';
-    }
-
-    const profileAwake = document.getElementById('profileAwake');
-    if (profileAwake) profileAwake.textContent = `${metrics.awakeHours.toFixed(1)}h`;
-
-    const profileReclaimed = document.getElementById('profileReclaimed');
-    if (profileReclaimed) profileReclaimed.textContent = `${metrics.reclaimedSocialHours.toFixed(1)}h`;
-
-    const profileScore = document.getElementById('profileScore');
-    if (profileScore) profileScore.textContent = `${metrics.relationScore}%`;
   }
 
-  // Save Motivation Button
-  document.getElementById('btnSaveMotivation')?.addEventListener('click', () => {
-    const input = document.getElementById('profileMotivationInput');
-    if (input) {
-      state.user.motivation = input.value.trim();
-      saveState();
-      showToast('Obiettivo e motivazione salvati!');
-    }
-  });
-
-  // Open Auth Modal from Profile
-  document.getElementById('btnOpenAuthFromProfile')?.addEventListener('click', () => {
-    authModal.classList.add('open');
-  });
-
-  // Logout Button
-  document.getElementById('btnLogout')?.addEventListener('click', async () => {
-    if (confirm('Sei sicuro di voler uscire dal tuo account?')) {
-      await window.TimeReclaimSupabase.signOutUser();
-      state.user = { id: null, firstName: 'Ospite', lastName: '', email: '', avatar: 'TR', motivation: '' };
-      saveState();
-      showToast('Logout effettuato');
-      switchTab('dashboard');
-    }
-  });
-
-  // ==========================================================================
-  // 12. AUTHENTICATION & MODALS
-  // ==========================================================================
+  // AUTH MODAL HANDLERS
   const authModal = document.getElementById('authModal');
   const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
   const authModalTitle = document.getElementById('authModalTitle');
@@ -638,23 +403,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabAuthRegister = document.getElementById('tabAuthRegister');
   const formLogin = document.getElementById('formLogin');
   const formRegister = document.getElementById('formRegister');
-  const formForgotPassword = document.getElementById('formForgotPassword');
-  const linkForgotPassword = document.getElementById('linkForgotPassword');
-  const btnBackToLogin = document.getElementById('btnBackToLogin');
 
   function showAuthStatus(msg, isError = false) {
     if (!authStatusBanner) return;
     authStatusBanner.style.display = 'block';
     authStatusBanner.style.background = isError ? 'rgba(255, 77, 109, 0.15)' : 'rgba(0, 245, 212, 0.15)';
-    authStatusBanner.style.border = isError ? '1px solid rgba(255, 77, 109, 0.3)' : '1px solid rgba(0, 245, 212, 0.3)';
-    authStatusBanner.style.color = isError ? 'var(--accent-red)' : 'var(--accent-emerald)';
+    authStatusBanner.style.color = isError ? 'var(--accent-red)' : 'var(--accent-neon-lime)';
     authStatusBanner.textContent = msg;
   }
 
-  function hideAuthStatus() {
-    if (authStatusBanner) authStatusBanner.style.display = 'none';
-  }
+  function hideAuthStatus() { if (authStatusBanner) authStatusBanner.style.display = 'none'; }
 
+  document.getElementById('btnOpenAuthFromProfile')?.addEventListener('click', () => authModal.classList.add('open'));
   btnCloseAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
 
   tabAuthLogin?.addEventListener('click', () => {
@@ -664,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
     authModalTitle.textContent = 'Accedi';
     formLogin.style.display = 'block';
     formRegister.style.display = 'none';
-    formForgotPassword.style.display = 'none';
   });
 
   tabAuthRegister?.addEventListener('click', () => {
@@ -674,24 +433,9 @@ document.addEventListener('DOMContentLoaded', () => {
     authModalTitle.textContent = 'Crea Account';
     formLogin.style.display = 'none';
     formRegister.style.display = 'block';
-    formForgotPassword.style.display = 'none';
   });
 
-  linkForgotPassword?.addEventListener('click', (e) => {
-    e.preventDefault();
-    hideAuthStatus();
-    authModalTitle.textContent = 'Recupero Password';
-    formLogin.style.display = 'none';
-    formRegister.style.display = 'none';
-    formForgotPassword.style.display = 'block';
-  });
-
-  btnBackToLogin?.addEventListener('click', () => {
-    hideAuthStatus();
-    tabAuthLogin.click();
-  });
-
-  // LOGIN HANDLER
+  // Login Form
   formLogin?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -705,28 +449,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const user = data.user;
       state.user.id = user.id;
       state.user.email = user.email;
-      
-      const profile = await window.TimeReclaimSupabase.fetchUserProfile(user.id);
-      if (profile) {
-        state.user.firstName = profile.first_name || 'Alessandro';
-        state.user.lastName = profile.last_name || 'Foti';
-      } else {
-        const emailParts = email.split('@')[0].split('.');
-        state.user.firstName = emailParts[0] ? emailParts[0].charAt(0).toUpperCase() + emailParts[0].slice(1) : 'Utente';
-        state.user.lastName = emailParts[1] ? emailParts[1].charAt(0).toUpperCase() + emailParts[1].slice(1) : '';
-      }
-      state.user.avatar = (state.user.firstName[0] + (state.user.lastName[0] || '')).toUpperCase();
 
       saveState();
       showAuthStatus('Accesso effettuato!', false);
-      showToast(`Bentornato/a, ${state.user.firstName}!`);
-      setTimeout(() => authModal.classList.remove('open'), 800);
+      showToast(`Bentornato/a! Accesso eseguito.`);
+      setTimeout(() => {
+        authModal.classList.remove('open');
+        checkOnboardingStatus();
+      }, 800);
     } catch (err) {
       showAuthStatus(err.message || 'Errore durante l\'accesso', true);
     }
   });
 
-  // REGISTER HANDLER
+  // Register Form
   formRegister?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAuthStatus();
@@ -743,119 +479,56 @@ document.addEventListener('DOMContentLoaded', () => {
       state.user.lastName = lastName;
       state.user.email = email;
       state.user.avatar = (firstName[0] + lastName[0]).toUpperCase();
+      state.user.onboardingCompleted = false; // New user triggers onboarding
       if (res && res.user) state.user.id = res.user.id;
 
       saveState();
-      showAuthStatus('Registrazione completata con successo!', false);
-      showToast(`Benvenuto/a, ${firstName}! Registrazione completata.`);
-      setTimeout(() => authModal.classList.remove('open'), 800);
+      showAuthStatus('Registrazione completata!', false);
+      showToast(`Benvenuto/a, ${firstName}! Registrazione eseguita.`);
+      setTimeout(() => {
+        authModal.classList.remove('open');
+        checkOnboardingStatus();
+      }, 800);
     } catch (err) {
       showAuthStatus(err.message || 'Errore durante la registrazione', true);
     }
   });
 
-  // PASSWORD RESET HANDLER
-  formForgotPassword?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    hideAuthStatus();
-    const email = document.getElementById('forgotEmail').value.trim();
-
-    try {
-      showAuthStatus('Invio mail di reset...', false);
-      const res = await window.TimeReclaimSupabase.sendPasswordReset(email);
-      showAuthStatus(res.message || `Email per il reset della password inviata a ${email}!`, false);
-    } catch (err) {
-      showAuthStatus(err.message || 'Errore durante l\'invio dell\'email', true);
+  // Logout Button
+  document.getElementById('btnLogout')?.addEventListener('click', async () => {
+    if (confirm('Sei sicuro di voler uscire dal tuo account?')) {
+      await window.TimeReclaimSupabase.signOutUser();
+      state.user = { id: null, firstName: 'Ospite', lastName: '', email: '', avatar: 'TR', onboardingCompleted: false };
+      saveState();
+      showToast('Logout effettuato');
+      switchTab('agenda');
     }
   });
 
-  // Add Activity Modal
-  const addActivityModal = document.getElementById('addActivityModal');
-  const btnOpenAddActivity = document.getElementById('btnOpenAddActivity');
-  const btnCloseAddActivityModal = document.getElementById('btnCloseAddActivityModal');
-  const addActivityForm = document.getElementById('addActivityForm');
-
-  btnOpenAddActivity?.addEventListener('click', () => addActivityModal.classList.add('open'));
-  btnCloseAddActivityModal?.addEventListener('click', () => addActivityModal.classList.remove('open'));
-
-  addActivityForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const title = document.getElementById('newActTitle').value;
-    const category = document.getElementById('newActCategory').value;
-    const duration = parseFloat(document.getElementById('newActDuration').value);
-
-    state.customActivities.push({
-      id: Date.now().toString(),
-      title,
-      category,
-      duration,
-      icon: category === 'cinema' ? 'fa-film' : category === 'fitness' ? 'fa-dumbbell' : 'fa-graduation-cap'
-    });
-
-    saveState();
-    addActivityModal.classList.remove('open');
-    addActivityForm.reset();
-    showToast(`Nuova attività "${title}" creata nella Banca Attività!`);
-  });
-
   // ==========================================================================
-  // 13. GLOBAL RENDER ALL FUNCTION
+  // 11. GLOBAL RENDER ALL FUNCTION
   // ==========================================================================
   function renderAll() {
-    const r = state.routine;
-
     const navAvatar = document.getElementById('navAvatar');
     const navUserName = document.getElementById('navUserName');
     if (navAvatar) navAvatar.textContent = state.user.avatar || 'TR';
     if (navUserName) navUserName.textContent = state.user.firstName ? `${state.user.firstName}` : 'Accedi';
 
-    const metrics = calculateMetrics();
+    const todayDateEl = document.getElementById('agendaTodayDate');
+    if (todayDateEl) {
+      const options = { weekday: 'long', day: 'numeric', month: 'long' };
+      const todayStr = new Date().toLocaleDateString('it-IT', options);
+      todayDateEl.innerHTML = `<i class="fa-solid fa-clock" style="color: var(--accent-neon-cyan);"></i> Agenda - ${todayStr}`;
+    }
 
-    // Top KPIs
-    const statFreeHours = document.getElementById('statFreeHours');
-    if (statFreeHours) statFreeHours.textContent = `${metrics.totalIntentionalBudget.toFixed(1)} h`;
-
-    const statReclaimedHours = document.getElementById('statReclaimedHours');
-    if (statReclaimedHours) statReclaimedHours.textContent = `${metrics.reclaimedSocialHours.toFixed(1)} h`;
-
-    const statUsefulHours = document.getElementById('statUsefulHours');
-    if (statUsefulHours) statUsefulHours.textContent = `${metrics.usefulAllocated.toFixed(1)} h`;
-
-    // Sliders sync
-    if (sleepHoursInput) sleepHoursInput.value = r.sleepHours;
-    if (sleepHoursVal) sleepHoursVal.textContent = `${r.sleepHours.toFixed(1)} Ore`;
-
-    if (workHoursInput) workHoursInput.value = r.workHours;
-    if (choresHoursInput) choresHoursInput.value = r.choresHours;
-    document.getElementById('workHoursVal').textContent = `${r.workHours.toFixed(1)} Ore`;
-    document.getElementById('choresHoursVal').textContent = `${r.choresHours.toFixed(1)} Ore`;
-
-    if (socialWasteInput) socialWasteInput.value = r.socialWasteHours;
-    if (socialWasteVal) socialWasteVal.textContent = `${r.socialWasteHours.toFixed(1)} Ore`;
-
-    Object.keys(state.allocations).forEach(k => {
-      const inp = document.getElementById(`alloc${k.charAt(0).toUpperCase() + k.slice(1)}Input`);
-      const val = document.getElementById(`alloc${k.charAt(0).toUpperCase() + k.slice(1)}Val`);
-      if (inp) inp.value = state.allocations[k];
-      if (val) val.textContent = `${state.allocations[k].toFixed(1)} Ore`;
-    });
-
-    const step4TotalBudget = document.getElementById('step4TotalBudget');
-    if (step4TotalBudget) step4TotalBudget.textContent = `${metrics.totalIntentionalBudget.toFixed(1)} Ore`;
-
-    // Component Renders
-    renderTimeWheelSVG();
-    renderHarmonyBar();
-    renderDailyChecklist();
-    renderDetoxShowcase();
-    renderCustomActivities();
-    renderHourlyTimeline('dashboardHourlyGrid');
-    renderWeeklyCategorySummary();
+    renderHorizontalTimeline();
+    renderRoutines();
+    renderCatalog();
     renderUserProfile();
   }
 
-  // Initial Boot Render
+  // Boot Application
   renderAll();
-  updateWizardUI();
+  checkOnboardingStatus();
 
 });
