@@ -58,9 +58,9 @@
           </button>
         </nav>
 
-        <button class="user-profile-btn" id="openProfileModal">
+        <button class="user-profile-btn" id="openAuthModal">
           <div class="user-avatar" id="navAvatar">AF</div>
-          <span class="user-name" id="navUserName">Alessandro</span>
+          <span class="user-name" id="navUserName">Accedi / Registrati</span>
         </button>
       </div>
     </header>
@@ -245,7 +245,7 @@
                   <i class="fa-solid fa-sliders" style="color: var(--accent-cyan);"></i>
                   Configura la tua Routine Quotidiana
                 </h2>
-                <p class="card-subtitle">Mappa le tue 24 ore a partire dai vincoli fino ad allocare il tempo libero desiderato</p>
+                <p class="card-subtitle">Mappa le tue 24 ore a partir dai vincoli fino ad allocare il tempo libero desiderato</p>
               </div>
             </div>
           </div>
@@ -655,65 +655,107 @@
     </main>
 
     <!-- ==========================================
-         PROFILE & SUPABASE INTEGRATION MODAL
+         AUTH MODAL (ACCEDI / REGISTRATI / RECUPERO PASSWORD)
          ========================================== -->
-    <div class="modal-backdrop" id="profileModal">
-      <div class="modal-glass">
+    <div class="modal-backdrop" id="authModal">
+      <div class="modal-glass" style="max-width: 480px;">
         <div class="modal-header">
-          <h3 class="modal-title">
-            <i class="fa-solid fa-circle-user" style="color: var(--accent-cyan);"></i>
-            Profilo Utente & Cloud Sync (Supabase)
-          </h3>
-          <button class="btn-close-modal" id="btnCloseProfileModal">
+          <h3 class="modal-title" id="authModalTitle">Accedi al tuo Account</h3>
+          <button class="btn-close-modal" id="btnCloseAuthModal">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
-        <form id="profileForm">
+        <!-- Auth Tabs Navigation -->
+        <div class="nav-tabs" style="width: 100%; margin-bottom: 1.25rem;">
+          <button class="nav-btn active" id="tabAuthLogin" style="flex: 1; justify-content: center;">Accedi</button>
+          <button class="nav-btn" id="tabAuthRegister" style="flex: 1; justify-content: center;">Registrati</button>
+        </div>
+
+        <!-- Status Message Banner -->
+        <div id="authStatusBanner" style="display: none; padding: 0.85rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+        <!-- 1. FORM ACCEDI -->
+        <form id="formLogin">
           <div class="form-group">
-            <label class="form-label">Nome Profilo</label>
-            <input type="text" class="input-glass" id="profileNameInput" value="Alessandro">
+            <label class="form-label">Email</label>
+            <input type="email" class="input-glass" id="loginEmail" placeholder="nome@esempio.com" required>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Iniziali Avatar</label>
-            <input type="text" class="input-glass" id="profileAvatarInput" value="AF" maxlength="2">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Motivazione Principale</label>
-            <input type="text" class="input-glass" id="profileMotivationInput" value="Coltivare le mie relazioni ed eliminare il tempo perso sui social">
-          </div>
-
-          <!-- Supabase Credentials Box -->
-          <div style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.2); padding: 1.25rem; border-radius: var(--radius-md); margin-top: 1.5rem;">
-            <h4 style="font-family: var(--font-heading); font-size: 1rem; color: var(--accent-cyan); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fa-solid fa-database"></i> Integrazione Supabase Cloud
-            </h4>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
-              Inserisci l'URL ed la Anon Key del tuo progetto Supabase per sincronizzare i tuoi dati su cloud o Vercel.
-            </p>
-
-            <div class="form-group" style="margin-bottom: 0.75rem;">
-              <label style="font-size: 0.8rem; color: var(--text-muted);">Supabase Project URL</label>
-              <input type="text" class="input-glass" id="supabaseUrlInput" placeholder="https://xyzcompany.supabase.co">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label class="form-label">Password</label>
+              <a href="#" id="linkForgotPassword" style="font-size: 0.8rem; color: var(--accent-cyan); text-decoration: none;">Password dimenticata?</a>
             </div>
+            <input type="password" class="input-glass" id="loginPassword" placeholder="••••••••" required>
+          </div>
 
-            <div class="form-group" style="margin-bottom: 0;">
-              <label style="font-size: 0.8rem; color: var(--text-muted);">Supabase Anon Key</label>
-              <input type="password" class="input-glass" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6...">
+          <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 1rem;">
+            <i class="fa-solid fa-right-to-bracket"></i> Accedi
+          </button>
+        </form>
+
+        <!-- 2. FORM REGISTRATI -->
+        <form id="formRegister" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label">Nome</label>
+              <input type="text" class="input-glass" id="regFirstName" placeholder="es. Alessandro" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cognome</label>
+              <input type="text" class="input-glass" id="regLastName" placeholder="es. Foti" required>
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
-            <button type="button" class="btn-glass btn-sm" id="btnResetData" style="color: var(--accent-red); border-color: rgba(255, 77, 109, 0.3);">
-              <i class="fa-solid fa-rotate-left"></i> Resetta Dati
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="input-glass" id="regEmail" placeholder="nome@esempio.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="input-glass" id="regPassword" placeholder="Almeno 6 caratteri" minlength="6" required>
+          </div>
+
+          <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 1rem;">
+            <i class="fa-solid fa-user-plus"></i> Crea Account
+          </button>
+        </form>
+
+        <!-- 3. FORM RECUPERO PASSWORD -->
+        <form id="formForgotPassword" style="display: none;">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Inserisci l'email associata al tuo account. Ti invieremo un'email alla tua casella di posta per reimpostare la password.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="input-glass" id="forgotEmail" placeholder="nome@esempio.com" required>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+            <button type="button" class="btn-glass" id="btnBackToLogin" style="flex: 1;">
+              <i class="fa-solid fa-arrow-left"></i> Torna ad Accedi
             </button>
-            <button type="submit" class="btn-glass btn-primary">
-              <i class="fa-solid fa-floppy-disk"></i> Salva Profilo & Connetti Cloud
+            <button type="submit" class="btn-glass btn-accent-pink" style="flex: 1.5;">
+              <i class="fa-solid fa-paper-plane"></i> Invia Email Reset
             </button>
           </div>
         </form>
+
+        <!-- Supabase Keys Settings Accordion inside Modal -->
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <details style="font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">
+            <summary style="font-weight: 600; color: var(--accent-cyan);"><i class="fa-solid fa-key"></i> Configura Credenziali Supabase Project</summary>
+            <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <input type="text" class="input-glass" id="sbUrlInput" placeholder="Supabase URL (es. https://xyz.supabase.co)">
+              <input type="password" class="input-glass" id="sbKeyInput" placeholder="Supabase Anon Key">
+              <button type="button" class="btn-glass btn-sm" id="btnSaveSbKeys" style="margin-top: 0.25rem;">Salva Credenziali Project</button>
+            </div>
+          </details>
+        </div>
+
       </div>
     </div>
 

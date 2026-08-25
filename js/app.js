@@ -1,6 +1,6 @@
 /**
  * TIME RECLAIM & ROUTINE MAXIMIZER - CORE APPLICATION ENGINE
- * Estetica Liquid Glass (Glassmorphism 2.0) con Supporto Supabase Cloud
+ * Estetica Liquid Glass (Glassmorphism 2.0) con Supabase Auth
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   const DEFAULT_STATE = {
     user: {
-      name: 'Alessandro',
+      id: null,
+      firstName: 'Alessandro',
+      lastName: 'Foti',
+      email: '',
       avatar: 'AF',
       motivation: 'Coltivare le mie relazioni ed eliminare il tempo perso sui social'
     },
@@ -22,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
       commuteHours: 1.0,
       choresHours: 2.5,
       socialWasteHours: 3.0,
-      detoxPercent: 0.7 // 70% reduction
+      detoxPercent: 0.7
     },
     allocations: {
       productive: 1.5,
@@ -62,9 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveState() {
     try {
       localStorage.setItem('time_reclaim_state', JSON.stringify(state));
-      // Cloud sync trigger if Supabase is configured
-      if (window.TimeReclaimSupabase && window.TimeReclaimSupabase.isConfigured()) {
-        window.TimeReclaimSupabase.syncStateToCloud(state);
+      // Trigger Supabase sync if user is logged in
+      if (window.TimeReclaimSupabase && window.TimeReclaimSupabase.isConfigured() && state.user.id) {
+        window.TimeReclaimSupabase.syncStateToCloud(state.user.id, state);
       }
     } catch (e) {
       console.error('Could not save state to localStorage.', e);
@@ -418,15 +421,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   function renderDetoxShowcase() {
     const metrics = calculateMetrics();
-    const r = state.routine;
 
     const weeklyHours = metrics.reclaimedSocialHours * 7;
     const monthHours = metrics.reclaimedSocialHours * 30;
     const yearHours = metrics.reclaimedSocialHours * 365;
 
-    // Equivalenti
     const booksYear = Math.round(yearHours / 25);
-    const workoutsYear = Math.round(weeklyHours * 2.5);
 
     // Dashboard detox widget
     const detoxWeeklyHours = document.getElementById('detoxWeeklyHours');
@@ -494,55 +494,168 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ==========================================================================
-  // 10. MODALS & USER PROFILE & SUPABASE LOGIC
+  // 10. AUTHENTICATION & MODAL CONTROLLERS
   // ==========================================================================
-  const profileModal = document.getElementById('profileModal');
-  const openProfileModal = document.getElementById('openProfileModal');
-  const btnCloseProfileModal = document.getElementById('btnCloseProfileModal');
-  const profileForm = document.getElementById('profileForm');
+  const authModal = document.getElementById('authModal');
+  const openAuthModal = document.getElementById('openAuthModal');
+  const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
+  const authModalTitle = document.getElementById('authModalTitle');
+  const authStatusBanner = document.getElementById('authStatusBanner');
 
-  openProfileModal?.addEventListener('click', () => {
-    document.getElementById('profileNameInput').value = state.user.name;
-    document.getElementById('profileAvatarInput').value = state.user.avatar;
-    document.getElementById('profileMotivationInput').value = state.user.motivation;
+  const tabAuthLogin = document.getElementById('tabAuthLogin');
+  const tabAuthRegister = document.getElementById('tabAuthRegister');
+  const formLogin = document.getElementById('formLogin');
+  const formRegister = document.getElementById('formRegister');
+  const formForgotPassword = document.getElementById('formForgotPassword');
+  const linkForgotPassword = document.getElementById('linkForgotPassword');
+  const btnBackToLogin = document.getElementById('btnBackToLogin');
 
-    if (window.TimeReclaimSupabase) {
-      const creds = window.TimeReclaimSupabase.getCredentials();
-      document.getElementById('supabaseUrlInput').value = creds.url;
-      document.getElementById('supabaseKeyInput').value = creds.key;
-    }
+  function showAuthStatus(msg, isError = false) {
+    if (!authStatusBanner) return;
+    authStatusBanner.style.display = 'block';
+    authStatusBanner.style.background = isError ? 'rgba(255, 77, 109, 0.15)' : 'rgba(0, 245, 212, 0.15)';
+    authStatusBanner.style.border = isError ? '1px solid rgba(255, 77, 109, 0.3)' : '1px solid rgba(0, 245, 212, 0.3)';
+    authStatusBanner.style.color = isError ? 'var(--accent-red)' : 'var(--accent-emerald)';
+    authStatusBanner.textContent = msg;
+  }
 
-    profileModal.classList.add('open');
+  function hideAuthStatus() {
+    if (authStatusBanner) authStatusBanner.style.display = 'none';
+  }
+
+  openAuthModal?.addEventListener('click', () => {
+    hideAuthStatus();
+    authModal.classList.add('open');
   });
 
-  btnCloseProfileModal?.addEventListener('click', () => {
-    profileModal.classList.remove('open');
+  btnCloseAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
+
+  // Switch Auth Tabs
+  tabAuthLogin?.addEventListener('click', () => {
+    hideAuthStatus();
+    tabAuthLogin.classList.add('active');
+    tabAuthRegister.classList.remove('active');
+    authModalTitle.textContent = 'Accedi al tuo Account';
+    formLogin.style.display = 'block';
+    formRegister.style.display = 'none';
+    formForgotPassword.style.display = 'none';
   });
 
-  profileForm?.addEventListener('submit', (e) => {
+  tabAuthRegister?.addEventListener('click', () => {
+    hideAuthStatus();
+    tabAuthRegister.classList.add('active');
+    tabAuthLogin.classList.remove('active');
+    authModalTitle.textContent = 'Crea il tuo Account';
+    formLogin.style.display = 'none';
+    formRegister.style.display = 'block';
+    formForgotPassword.style.display = 'none';
+  });
+
+  linkForgotPassword?.addEventListener('click', (e) => {
     e.preventDefault();
-    state.user.name = document.getElementById('profileNameInput').value;
-    state.user.avatar = document.getElementById('profileAvatarInput').value;
-    state.user.motivation = document.getElementById('profileMotivationInput').value;
-
-    const sbUrl = document.getElementById('supabaseUrlInput').value.trim();
-    const sbKey = document.getElementById('supabaseKeyInput').value.trim();
-
-    if (sbUrl && sbKey && window.TimeReclaimSupabase) {
-      window.TimeReclaimSupabase.setCredentials(sbUrl, sbKey);
-    }
-
-    saveState();
-    profileModal.classList.remove('open');
+    hideAuthStatus();
+    authModalTitle.textContent = 'Recupero Password';
+    formLogin.style.display = 'none';
+    formRegister.style.display = 'none';
+    formForgotPassword.style.display = 'block';
   });
 
-  document.getElementById('btnResetData')?.addEventListener('click', () => {
-    if (confirm('Vuoi davvero resettare la tua routine ai valori predefiniti?')) {
-      state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  btnBackToLogin?.addEventListener('click', () => {
+    hideAuthStatus();
+    tabAuthLogin.click();
+  });
+
+  // SUBMIT 1: LOGIN
+  formLogin?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAuthStatus();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    try {
+      showAuthStatus('Autenticazione in corso...', false);
+      const data = await window.TimeReclaimSupabase.signInUser({ email, password });
+      showAuthStatus('Accesso effettuato con successo!', false);
+      
+      const user = data.user;
+      state.user.id = user.id;
+      state.user.email = user.email;
+      
+      // Load user profile from Supabase if available
+      const profile = await window.TimeReclaimSupabase.fetchUserProfile(user.id);
+      if (profile) {
+        state.user.firstName = profile.first_name || 'Alessandro';
+        state.user.lastName = profile.last_name || 'Foti';
+        state.user.avatar = profile.avatar || (state.user.firstName[0] + state.user.lastName[0]);
+      }
+
       saveState();
-      profileModal.classList.remove('open');
+      setTimeout(() => authModal.classList.remove('open'), 1000);
+    } catch (err) {
+      showAuthStatus(err.message || 'Errore durante l\'accesso', true);
     }
   });
+
+  // SUBMIT 2: REGISTRATION (Nome, Cognome, Email, Password)
+  formRegister?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAuthStatus();
+    const firstName = document.getElementById('regFirstName').value.trim();
+    const lastName = document.getElementById('regLastName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+
+    try {
+      showAuthStatus('Creazione account in corso...', false);
+      await window.TimeReclaimSupabase.signUpUser({ firstName, lastName, email, password });
+      showAuthStatus('Registrazione completata! Controlla la tua email per confermare l\'account.', false);
+      
+      state.user.firstName = firstName;
+      state.user.lastName = lastName;
+      state.user.email = email;
+      state.user.avatar = (firstName[0] + lastName[0]).toUpperCase();
+      saveState();
+    } catch (err) {
+      showAuthStatus(err.message || 'Errore durante la registrazione', true);
+    }
+  });
+
+  // SUBMIT 3: PASSWORD RECOVERY VIA EMAIL
+  formForgotPassword?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAuthStatus();
+    const email = document.getElementById('forgotEmail').value.trim();
+
+    try {
+      showAuthStatus('Invio email di reset in corso...', false);
+      await window.TimeReclaimSupabase.sendPasswordReset(email);
+      showAuthStatus(`Email per il reset della password inviata con successo alla tua casella postale (${email})!`, false);
+    } catch (err) {
+      showAuthStatus(err.message || 'Errore durante la richiesta di recupero password', true);
+    }
+  });
+
+  // Save Credentials Config Button
+  document.getElementById('btnSaveSbKeys')?.addEventListener('click', () => {
+    const url = document.getElementById('sbUrlInput').value.trim();
+    const key = document.getElementById('sbKeyInput').value.trim();
+
+    if (url && key) {
+      window.TimeReclaimSupabase.setCredentials(url, key);
+      alert('Credenziali Supabase aggiornate!');
+    }
+  });
+
+  // Listen to Supabase Auth Changes
+  if (window.TimeReclaimSupabase) {
+    window.TimeReclaimSupabase.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        state.user.id = session.user.id;
+        state.user.email = session.user.email;
+        saveState();
+      }
+    });
+  }
 
   // Add Activity Modal
   const addActivityModal = document.getElementById('addActivityModal');
@@ -579,8 +692,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Nav Profile update
     const navAvatar = document.getElementById('navAvatar');
     const navUserName = document.getElementById('navUserName');
-    if (navAvatar) navAvatar.textContent = state.user.avatar;
-    if (navUserName) navUserName.textContent = state.user.name;
+    if (navAvatar) navAvatar.textContent = state.user.avatar || 'TR';
+    if (navUserName) navUserName.textContent = state.user.firstName ? `${state.user.firstName} ${state.user.lastName}` : 'Accedi / Registrati';
 
     // Metrics
     const metrics = calculateMetrics();
