@@ -1,12 +1,12 @@
 /**
- * TIME RECLAIM - FULL-STACK ENGINE & UI UX ARCHITECTURE
- * Mobile-First Liquid Glass Experience: Onboarding 6 Step, Timeline Orizzontale Snap, 4 Viste & FAB
+ * TIME RECLAIM - FULL-STACK ENGINE & WIREFRAME LAYOUT SYSTEM
+ * Layout allineato ai 3 Wireframe: Day Chips, Timeline Segmentata, KPI Trio, Card Visive con Sfondo WCAG, Dashed Add Card e Storici.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================================================
-  // 1. DEFAULT STATE STORE & LOCALSTORAGE PERSISTENCE
+  // 1. STATE STORE & LOCALSTORAGE PERSISTENCE
   // ==========================================================================
   const DEFAULT_STATE = {
     user: {
@@ -15,31 +15,54 @@ document.addEventListener('DOMContentLoaded', () => {
       lastName: 'Foti',
       email: 'alessandro@esempio.com',
       avatar: 'AF',
-      onboardingCompleted: false,
-      googleCalendarLinked: true,
-      freeTimeGoalMinutes: 180,
-      wakeTime: '07:00',
-      sleepTime: '23:00'
+      streakDays: 3,
+      noSocialHours: 15,
+      freeTimeHours: 5.0
     },
-    timelineBlocks: [
-      { id: 'b1', title: 'Risveglio & Caffè', startTime: '07:00', endTime: '07:30', tag: 'dovere' },
-      { id: 'b2', title: 'Lavoro Focus', startTime: '09:00', endTime: '13:00', tag: 'dovere' },
-      { id: 'b3', title: 'Pausa Pranzo Intenzionale', startTime: '13:00', endTime: '14:00', tag: 'tempo_libero' },
-      { id: 'b4', title: 'Lavoro Pomeriggio', startTime: '14:00', endTime: '18:00', tag: 'dovere' },
-      { id: 'b5', title: 'Workout / Palestra', startTime: '18:30', endTime: '19:30', tag: 'tempo_libero' },
-      { id: 'b6', title: 'Cinema & Relax Serale', startTime: '21:00', endTime: '23:00', tag: 'tempo_libero' }
+    plannedActivities: [
+      { id: 'p1', title: 'Lavoro', startTime: '9:00', endTime: '13:00', tag: 'busy' },
+      { id: 'p2', title: 'Pranzo', startTime: '13:00', endTime: '14:00', tag: 'free' },
+      { id: 'p3', title: 'Lavoro', startTime: '14:00', endTime: '18:00', tag: 'busy' },
+      { id: 'p4', title: 'Cena', startTime: '20:00', endTime: '21:00', tag: 'free' }
     ],
-    routines: [
-      { id: 'r1', title: 'Idratazione & Stretching', moment: 'mattina', isActive: true, startTime: '07:15', endTime: '07:30' },
-      { id: 'r2', title: 'Pianificazione Priorità', moment: 'lavoro', isActive: true, startTime: '09:00', endTime: '09:15' },
-      { id: 'r3', title: 'Lettura o Musica', moment: 'sera', isActive: true, startTime: '22:00', endTime: '22:45' }
+    suggestedActivities: [
+      {
+        id: 's1',
+        title: 'Yoga',
+        subtitle: 'Sessione di stretching e relax',
+        duration: '45 minuti',
+        tag: 'free',
+        bgImage: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?q=80&w=800&auto=format&fit=crop'
+      },
+      {
+        id: 's2',
+        title: 'Serie tv',
+        subtitle: 'Tempo: 50 minuti',
+        duration: '50 minuti',
+        tag: 'free',
+        bgImage: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?q=80&w=800&auto=format&fit=crop'
+      },
+      {
+        id: 's3',
+        title: 'Basket',
+        subtitle: 'Partita al parco',
+        duration: '50 minuti',
+        tag: 'free',
+        bgImage: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=800&auto=format&fit=crop'
+      },
+      {
+        id: 's4',
+        title: 'Allenamento',
+        subtitle: 'Sessione palestra/workout',
+        duration: '1h e 30 min',
+        tag: 'free',
+        bgImage: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop'
+      }
     ],
-    catalog: [
-      { id: 'c1', title: 'Allenamento in Palestra', tag: 'tempo_libero', durationMinutes: 60, icon: 'fa-dumbbell' },
-      { id: 'c2', title: 'Lettura o Corso Online', tag: 'tempo_libero', durationMinutes: 90, icon: 'fa-book' },
-      { id: 'c3', title: 'Film / Serie TV', tag: 'tempo_libero', durationMinutes: 120, icon: 'fa-film' },
-      { id: 'c4', title: 'Faccende Domestiche', tag: 'dovere', durationMinutes: 45, icon: 'fa-broom' },
-      { id: 'c5', title: 'Sessione di Studio / Work', tag: 'dovere', durationMinutes: 120, icon: 'fa-briefcase' }
+    activityHistory: [
+      { id: 'h1', title: 'Lavoro', durationText: '8 h', tag: 'busy' },
+      { id: 'h2', title: 'Basket', durationText: '50 min', tag: 'free' },
+      { id: 'h3', title: 'Allenamento', durationText: '1h e 30 min', tag: 'free' }
     ]
   };
 
@@ -68,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 2. TOAST NOTIFICATION UTILITY
+  // 2. TOAST NOTIFICATIONS
   // ==========================================================================
   function showToast(message) {
     const toastContainer = document.getElementById('toastContainer');
@@ -83,16 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 3. NAVIGATION SYSTEM (4 MAIN VIEWS)
+  // 3. NAVIGATION (4 WIREFRAME TABS)
   // ==========================================================================
   const navItems = document.querySelectorAll('.nav-item');
   const viewSections = document.querySelectorAll('.view-section');
 
   navItems.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetTab = btn.dataset.tab;
-      switchTab(targetTab);
-    });
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
   function switchTab(tabId) {
@@ -101,434 +121,301 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  document.getElementById('headerAvatarBtn')?.addEventListener('click', () => switchTab('profile'));
-
   // ==========================================================================
-  // 4. ONBOARDING MULTI-STEP WIZARD (6 STEPS)
+  // 4. HEADER DATE & DAY CHIPS RENDERER (WIREFRAME 1 & 2)
   // ==========================================================================
-  let currentOnboardingStep = 1;
-
-  const onboardingWizard = document.getElementById('onboardingWizard');
-  const onboardingStepTitle = document.getElementById('onboardingStepTitle');
-  const onboardingStepPercent = document.getElementById('onboardingStepPercent');
-  const onboardingProgressFill = document.getElementById('onboardingProgressFill');
-
-  function updateOnboardingStepUI() {
-    for (let s = 1; s <= 6; s++) {
-      const stepEl = document.getElementById(`onbStep${s}`);
-      if (stepEl) stepEl.classList.toggle('active', s === currentOnboardingStep);
+  function renderHeaderDateAndChips() {
+    const dateEl = document.getElementById('currentFormattedDate');
+    if (dateEl) {
+      const now = new Date();
+      const options = { day: 'numeric', month: 'long' };
+      dateEl.textContent = now.toLocaleDateString('it-IT', options);
     }
 
-    const percent = Math.round((currentOnboardingStep / 6) * 100);
-    if (onboardingStepTitle) onboardingStepTitle.textContent = `Passo ${currentOnboardingStep} di 6`;
-    if (onboardingStepPercent) onboardingStepPercent.textContent = `${percent}%`;
-    if (onboardingProgressFill) onboardingProgressFill.style.width = `${percent}%`;
-  }
-
-  function checkOnboardingStatus() {
-    if (!state.user.onboardingCompleted) {
-      if (onboardingWizard) onboardingWizard.style.display = 'flex';
-      currentOnboardingStep = 1;
-      updateOnboardingStepUI();
-    } else {
-      if (onboardingWizard) onboardingWizard.style.display = 'none';
-    }
-  }
-
-  // Step 1 -> Step 2
-  document.getElementById('onbBtnStep1Next')?.addEventListener('click', () => {
-    currentOnboardingStep = 2;
-    updateOnboardingStepUI();
-  });
-
-  // Step 2 -> Step 3
-  document.getElementById('onbBtnStep2Prev')?.addEventListener('click', () => { currentOnboardingStep = 1; updateOnboardingStepUI(); });
-  document.getElementById('onbBtnStep2Next')?.addEventListener('click', () => {
-    state.user.wakeTime = document.getElementById('onbWakeTime').value;
-    state.user.sleepTime = document.getElementById('onbSleepTime').value;
-    currentOnboardingStep = 3;
-    updateOnboardingStepUI();
-  });
-
-  // Step 3 -> Step 4
-  document.getElementById('onbBtnStep3Prev')?.addEventListener('click', () => { currentOnboardingStep = 2; updateOnboardingStepUI(); });
-  document.getElementById('onbBtnStep3Next')?.addEventListener('click', () => {
-    currentOnboardingStep = 4;
-    updateOnboardingStepUI();
-  });
-
-  // Step 4 Goal Slider
-  const onbFreeGoalInput = document.getElementById('onbFreeGoalInput');
-  const onbFreeGoalVal = document.getElementById('onbFreeGoalVal');
-
-  onbFreeGoalInput?.addEventListener('input', (e) => {
-    const mins = parseInt(e.target.value);
-    state.user.freeTimeGoalMinutes = mins;
-    const hours = (mins / 60).toFixed(1);
-    if (onbFreeGoalVal) onbFreeGoalVal.textContent = `${hours} Ore (${mins} min)`;
-  });
-
-  document.getElementById('onbBtnStep4Prev')?.addEventListener('click', () => { currentOnboardingStep = 3; updateOnboardingStepUI(); });
-  document.getElementById('onbBtnStep4Next')?.addEventListener('click', () => {
-    currentOnboardingStep = 5;
-    updateOnboardingStepUI();
-  });
-
-  // Step 5 -> Step 6 (Timeline Generation Loading)
-  document.getElementById('onbBtnStep5Prev')?.addEventListener('click', () => { currentOnboardingStep = 4; updateOnboardingStepUI(); });
-  document.getElementById('onbBtnStep5Next')?.addEventListener('click', () => {
-    state.user.notifyStreaks = document.getElementById('onbNotifyStreaks')?.checked ?? true;
-    state.user.notifyWeekly = document.getElementById('onbNotifyWeekly')?.checked ?? true;
-    
-    currentOnboardingStep = 6;
-    updateOnboardingStepUI();
-
-    // Loading Progress Bar Animation
-    let progress = 0;
-    const genFill = document.getElementById('onbGenProgressFill');
-    const interval = setInterval(() => {
-      progress += 20;
-      if (genFill) genFill.style.width = `${progress}%`;
-      if (progress >= 100) {
-        clearInterval(interval);
-        state.user.onboardingCompleted = true;
-        saveState();
-        setTimeout(() => {
-          if (onboardingWizard) onboardingWizard.style.display = 'none';
-          showToast('Timeline generata! Benvenuto in TimeReclaim.');
-          switchTab('agenda');
-        }, 500);
-      }
-    }, 400);
-  });
-
-  // ==========================================================================
-  // 6. CORE COMPONENT: HORIZONTAL TIMELINE SNAP-TO-CARD (AGENDA)
-  // ==========================================================================
-  function renderHorizontalTimeline() {
-    const container = document.getElementById('horizontalTimeline');
-    if (!container) return;
-
-    if (state.timelineBlocks.length === 0) {
-      container.innerHTML = `<div style="padding: 1rem; color: var(--text-muted);">Nessuna attività programmata oggi. Usa il tasto (+) in basso a destra per aggiungerne una!</div>`;
-      return;
-    }
-
-    container.innerHTML = state.timelineBlocks.map(b => {
-      const isFree = b.tag === 'tempo_libero';
-      return `
-        <div class="timeline-card-block ${isFree ? 'block-free-time' : 'block-duty'}">
-          <div>
-            <div class="block-time">
-              <i class="fa-solid ${isFree ? 'fa-sparkles' : 'fa-clock'}"></i>
-              ${b.startTime} - ${b.endTime}
-            </div>
-            <h4 class="block-title">${b.title}</h4>
-          </div>
-          <div>
-            <span class="block-badge">${isFree ? '✨ Tempo Libero' : '💼 Dovere'}</span>
-          </div>
-        </div>
-      `;
-    }).join('');
+    const dayItems = document.querySelectorAll('.day-chip-item');
+    dayItems.forEach((chip, idx) => {
+      chip.onclick = () => {
+        dayItems.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      };
+    });
   }
 
   // ==========================================================================
-  // 7. ROUTINE MANAGEMENT BY MOMENTS
+  // 5. SEGMENTED 24-HOUR TIMELINE PROGRESS BAR RENDERER
   // ==========================================================================
-  function renderRoutines() {
-    const morningList = document.getElementById('routineMorningList');
-    const workList = document.getElementById('routineWorkList');
-    const eveningList = document.getElementById('routineEveningList');
+  function renderSegmentedTimeline(containerId) {
+    const track = document.getElementById(containerId);
+    if (!track) return;
 
-    const renderList = (listEl, moment) => {
-      if (!listEl) return;
-      const items = state.routines.filter(r => r.moment === moment);
-      if (items.length === 0) {
-        listEl.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); padding: 0.5rem;">Nessun blocco per questo momento.</p>`;
-        return;
-      }
-      listEl.innerHTML = items.map(r => `
-        <div class="check-item">
-          <div class="check-left">
-            <span class="check-title">${r.title}</span>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">(${r.startTime} - ${r.endTime})</span>
+    // Pattern matching Wireframe 1 & 2 timeline bar (sleep -> busy -> lunch free -> busy -> evening free -> sleep)
+    const segments = [
+      { type: 'sleep', widthPercent: 29 }, // 00:00 - 07:00
+      { type: 'busy', widthPercent: 25 },  // 07:00 - 13:00 Lavoro
+      { type: 'free', widthPercent: 8 },   // 13:00 - 14:00 Pranzo
+      { type: 'busy', widthPercent: 17 },  // 14:00 - 18:00 Lavoro
+      { type: 'free', widthPercent: 12 },  // 18:00 - 21:00 Tempo Libero
+      { type: 'sleep', widthPercent: 9 }   // 21:00 - 24:00
+    ];
+
+    track.innerHTML = segments.map(s => `
+      <div class="segmented-piece ${s.type}" style="width: ${s.widthPercent}%;"></div>
+    `).join('');
+  }
+
+  // ==========================================================================
+  // 6. KPI TRIO RENDERER (WIREFRAME 1)
+  // ==========================================================================
+  function renderKPITrio() {
+    const kpiFreeTime = document.getElementById('kpiFreeTime');
+    const kpiNoSocial = document.getElementById('kpiNoSocial');
+    const kpiStreak = document.getElementById('kpiStreak');
+
+    if (kpiFreeTime) kpiFreeTime.textContent = `${state.user.freeTimeHours} h`;
+    if (kpiNoSocial) kpiNoSocial.textContent = `${state.user.noSocialHours} h`;
+    if (kpiStreak) kpiStreak.textContent = `x${state.user.streakDays} gg`;
+  }
+
+  // ==========================================================================
+  // 7. SUGGESTED ACTIVITIES CAROUSEL RENDERER (WCAG ACCESSIBILITY COMPLIANT)
+  // ==========================================================================
+  function renderSuggestedCarousels() {
+    const renderCarousel = (containerId) => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      container.innerHTML = state.suggestedActivities.map(item => `
+        <div class="image-bg-card" style="background-image: url('${item.bgImage}');">
+          <!-- Dark Gradient Overlay for WCAG Text Contrast -->
+          <div class="card-image-overlay"></div>
+
+          <div class="card-image-content">
+            <h3 class="card-image-title">${item.title}</h3>
+            <p class="card-image-subtitle">${item.subtitle || item.duration}</p>
+            <button class="btn-glass btn-primary btn-sm" style="margin-top: 0.35rem; width: 100%;" onclick="addSuggestedToToday('${item.title}', '${item.duration}')">
+              <i class="fa-solid fa-plus"></i> Add activity
+            </button>
           </div>
-          <label class="glass-switch">
-            <input type="checkbox" ${r.isActive ? 'checked' : ''} onchange="toggleRoutineActive('${r.id}')">
-            <span class="switch-slider"></span>
-          </label>
         </div>
       `).join('');
     };
 
-    renderList(morningList, 'mattina');
-    renderList(workList, 'lavoro');
-    renderList(eveningList, 'sera');
+    renderCarousel('agendaSuggestedCarousel');
+    renderCarousel('catalogSuggestedCarousel');
   }
 
-  window.toggleRoutineActive = function(id) {
-    const item = state.routines.find(r => r.id === id);
-    if (item) {
-      item.isActive = !item.isActive;
-      saveState();
-      showToast(`Routine "${item.title}" ${item.isActive ? 'attivata' : 'disattivata'}`);
-    }
+  window.addSuggestedToToday = function(title, duration) {
+    state.plannedActivities.push({
+      id: Date.now().toString(),
+      title,
+      startTime: '18:30',
+      endTime: '19:30',
+      tag: 'free'
+    });
+
+    state.activityHistory.push({
+      id: Date.now().toString(),
+      title,
+      durationText: duration,
+      tag: 'free'
+    });
+
+    saveState();
+    showToast(`Attività "${title}" aggiunta al tuo piano di oggi!`);
   };
 
   // ==========================================================================
-  // 8. ACTIVITIES CATALOG & LIBRERIA
+  // 8. PLANNED ACTIVITIES LIST RENDERER (WIREFRAME 2)
   // ==========================================================================
-  function renderCatalog() {
-    const grid = document.getElementById('catalogActivitiesGrid');
-    if (!grid) return;
+  function renderPlannedActivities() {
+    const container = document.getElementById('plannedActivitiesList');
+    if (!container) return;
 
-    grid.innerHTML = state.catalog.map(c => `
-      <div class="option-card" style="border-color: ${c.tag === 'tempo_libero' ? 'var(--tag-free-time-border)' : 'var(--glass-border)'}">
-        <div class="option-icon" style="background: ${c.tag === 'tempo_libero' ? 'var(--accent-neon-cyan)' : 'var(--accent-blue)'}; color: #050b14;">
-          <i class="fa-solid ${c.icon || 'fa-star'}"></i>
-        </div>
-        <div class="option-info">
-          <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff;">${c.title}</h4>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">Durata: ${c.durationMinutes} min</p>
-        </div>
-        <button class="btn-glass btn-sm" style="margin-top: 0.35rem;" onclick="addCatalogToAgenda('${c.title}', '${c.tag}')">
-          <i class="fa-solid fa-plus"></i> Aggiungi all'Agenda
-        </button>
+    if (state.plannedActivities.length === 0) {
+      container.innerHTML = `<p style="color: var(--text-muted); padding: 0.5rem;">Nessuna attività pianificata. Clicca su "+ Add Activity" sopra!</p>`;
+      return;
+    }
+
+    container.innerHTML = state.plannedActivities.map(item => `
+      <div class="planned-item-card">
+        <span class="planned-item-title">${item.title}</span>
+        <span class="planned-item-time">${item.startTime}-${item.endTime}</span>
       </div>
     `).join('');
   }
 
-  window.addCatalogToAgenda = function(title, tag) {
-    state.timelineBlocks.push({
-      id: Date.now().toString(),
-      title,
-      startTime: '18:00',
-      endTime: '19:30',
-      tag
-    });
-    saveState();
-    showToast(`Attività "${title}" aggiunta alla timeline!`);
-  };
+  // ==========================================================================
+  // 9. ACTIVITY HISTORY LIST RENDERER (WIREFRAME 3)
+  // ==========================================================================
+  function renderActivityHistory() {
+    const container = document.getElementById('historyActivitiesList');
+    if (!container) return;
+
+    container.innerHTML = state.activityHistory.map(item => `
+      <div class="history-item-card">
+        <span class="planned-item-title">${item.title}</span>
+        <span class="planned-item-time">${item.durationText}</span>
+      </div>
+    `).join('');
+  }
 
   // ==========================================================================
-  // 9. FAB (+) QUICK ADD MODAL & GOOGLE CALENDAR SYNC
+  // 10. MODAL QUICK ADD HANDLERS
   // ==========================================================================
   const quickAddModal = document.getElementById('quickAddModal');
-  const fabQuickAdd = document.getElementById('fabQuickAdd');
   const btnCloseQuickAddModal = document.getElementById('btnCloseQuickAddModal');
+  const fabQuickAdd = document.getElementById('fabQuickAdd');
+  const btnAgendaAddActivity = document.getElementById('btnAgendaAddActivity');
+  const btnRoutineAddDashed = document.getElementById('btnRoutineAddDashed');
 
-  let selectedQuickTag = 'tempo_libero';
+  let selectedTag = 'free';
 
-  fabQuickAdd?.addEventListener('click', () => quickAddModal.classList.add('open'));
-  btnCloseQuickAddModal?.addEventListener('click', () => quickAddModal.classList.remove('open'));
+  const openQuickAddModal = () => quickAddModal?.classList.add('open');
+  const closeQuickAddModal = () => quickAddModal?.classList.remove('open');
+
+  fabQuickAdd?.addEventListener('click', openQuickAddModal);
+  btnAgendaAddActivity?.addEventListener('click', openQuickAddModal);
+  btnRoutineAddDashed?.addEventListener('click', openQuickAddModal);
+  btnCloseQuickAddModal?.addEventListener('click', closeQuickAddModal);
 
   const btnTagFreeTime = document.getElementById('btnTagFreeTime');
   const btnTagDuty = document.getElementById('btnTagDuty');
 
   btnTagFreeTime?.addEventListener('click', () => {
-    selectedQuickTag = 'tempo_libero';
-    btnTagFreeTime.className = 'btn-glass btn-primary btn-sm';
-    btnTagDuty.className = 'btn-glass btn-secondary btn-sm';
+    selectedTag = 'free';
+    btnTagFreeTime.className = 'btn-glass btn-accent-free btn-sm';
+    btnTagDuty.className = 'btn-glass btn-primary btn-sm';
   });
 
   btnTagDuty?.addEventListener('click', () => {
-    selectedQuickTag = 'dovere';
+    selectedTag = 'busy';
     btnTagDuty.className = 'btn-glass btn-primary btn-sm';
-    btnTagFreeTime.className = 'btn-glass btn-secondary btn-sm';
+    btnTagFreeTime.className = 'btn-glass btn-accent-free btn-sm';
   });
 
-  document.getElementById('formQuickAdd')?.addEventListener('submit', async (e) => {
+  document.getElementById('formQuickAdd')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const title = document.getElementById('quickActTitle').value.trim();
     const startTime = document.getElementById('quickActStart').value;
     const endTime = document.getElementById('quickActEnd').value;
 
-    const newBlock = {
+    state.plannedActivities.push({
       id: Date.now().toString(),
       title,
       startTime,
       endTime,
-      tag: selectedQuickTag
-    };
+      tag: selectedTag
+    });
 
-    state.timelineBlocks.push(newBlock);
+    state.activityHistory.push({
+      id: Date.now().toString(),
+      title,
+      durationText: '1 h',
+      tag: selectedTag
+    });
+
     saveState();
-
-    quickAddModal.classList.remove('open');
+    closeQuickAddModal();
     document.getElementById('formQuickAdd').reset();
-    showToast(`Attività "${title}" salvata nell'Agenda!`);
-
-    // Call Supabase Edge Function to sync to Google Calendar if linked
-    if (state.user.googleCalendarLinked && window.TimeReclaimSupabase && window.TimeReclaimSupabase.isConfigured()) {
-      try {
-        console.log('Chiamata asincrona Supabase Edge Function per Google Calendar API...');
-      } catch (err) {
-        console.warn('Sync Google Calendar warn:', err);
-      }
-    }
+    showToast(`Attività "${title}" salvata!`);
   });
 
   // ==========================================================================
-  // 10. USER PROFILE SCREEN RENDERER & AUTH
+  // 11. USER PROFILE RENDERER & AUTH
   // ==========================================================================
   function renderUserProfile() {
     const profileAvatarLarge = document.getElementById('profileAvatarLarge');
     const profileName = document.getElementById('profileName');
     const profileEmail = document.getElementById('profileEmail');
-    const profileStatusBadge = document.getElementById('profileStatusBadge');
 
-    if (profileAvatarLarge) profileAvatarLarge.textContent = state.user.avatar || 'TR';
+    if (profileAvatarLarge) profileAvatarLarge.textContent = state.user.avatar || 'AF';
     if (profileName) profileName.textContent = state.user.firstName ? `${state.user.firstName} ${state.user.lastName}` : 'Alessandro Foti';
     if (profileEmail) profileEmail.textContent = state.user.email || 'alessandro@esempio.com';
-
-    if (profileStatusBadge) {
-      if (state.user.id && !state.user.id.startsWith('usr_')) {
-        profileStatusBadge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> Supabase Cloud Connected`;
-        profileStatusBadge.style.color = 'var(--accent-neon-cyan)';
-      } else {
-        profileStatusBadge.innerHTML = `<i class="fa-solid fa-hard-drive"></i> Profilo Utente Attivo`;
-        profileStatusBadge.style.color = 'var(--accent-neon-lime)';
-      }
-    }
   }
 
-  // AUTH MODAL HANDLERS
+  // Auth Handlers
   const authModal = document.getElementById('authModal');
   const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
-  const authModalTitle = document.getElementById('authModalTitle');
-  const authStatusBanner = document.getElementById('authStatusBanner');
-
   const tabAuthLogin = document.getElementById('tabAuthLogin');
   const tabAuthRegister = document.getElementById('tabAuthRegister');
   const formLogin = document.getElementById('formLogin');
   const formRegister = document.getElementById('formRegister');
 
-  function showAuthStatus(msg, isError = false) {
-    if (!authStatusBanner) return;
-    authStatusBanner.style.display = 'block';
-    authStatusBanner.style.background = isError ? 'rgba(255, 77, 109, 0.15)' : 'rgba(0, 245, 212, 0.15)';
-    authStatusBanner.style.color = isError ? 'var(--accent-red)' : 'var(--accent-neon-lime)';
-    authStatusBanner.textContent = msg;
-  }
-
-  function hideAuthStatus() { if (authStatusBanner) authStatusBanner.style.display = 'none'; }
-
-  document.getElementById('btnOpenAuthFromProfile')?.addEventListener('click', () => authModal.classList.add('open'));
-  btnCloseAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
+  document.getElementById('btnOpenAuthFromProfile')?.addEventListener('click', () => authModal?.classList.add('open'));
+  btnCloseAuthModal?.addEventListener('click', () => authModal?.classList.remove('open'));
 
   tabAuthLogin?.addEventListener('click', () => {
-    hideAuthStatus();
-    tabAuthLogin.classList.add('active');
-    tabAuthRegister.classList.remove('active');
-    authModalTitle.textContent = 'Accedi';
     formLogin.style.display = 'block';
     formRegister.style.display = 'none';
   });
 
   tabAuthRegister?.addEventListener('click', () => {
-    hideAuthStatus();
-    tabAuthRegister.classList.add('active');
-    tabAuthLogin.classList.remove('active');
-    authModalTitle.textContent = 'Crea Account';
     formLogin.style.display = 'none';
     formRegister.style.display = 'block';
   });
 
-  // Login Form
   formLogin?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    hideAuthStatus();
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
-
     try {
-      showAuthStatus('Accesso in corso...', false);
       const data = await window.TimeReclaimSupabase.signInUser({ email, password });
-      
-      const user = data.user;
-      state.user.id = user.id;
-      state.user.email = user.email;
-
+      if (data && data.user) state.user.id = data.user.id;
       saveState();
-      showAuthStatus('Accesso effettuato!', false);
-      showToast(`Bentornato/a! Accesso eseguito.`);
-      setTimeout(() => {
-        authModal.classList.remove('open');
-        checkOnboardingStatus();
-      }, 800);
+      authModal?.classList.remove('open');
+      showToast('Accesso effettuato!');
     } catch (err) {
-      showAuthStatus(err.message || 'Errore durante l\'accesso', true);
+      showToast('Errore durante l\'accesso');
     }
   });
 
-  // Register Form
   formRegister?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    hideAuthStatus();
     const firstName = document.getElementById('regFirstName').value.trim();
     const lastName = document.getElementById('regLastName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
     const password = document.getElementById('regPassword').value.trim();
 
     try {
-      showAuthStatus('Creazione account in corso...', false);
       const res = await window.TimeReclaimSupabase.signUpUser({ firstName, lastName, email, password });
-      
       state.user.firstName = firstName;
       state.user.lastName = lastName;
       state.user.email = email;
       state.user.avatar = (firstName[0] + lastName[0]).toUpperCase();
-      state.user.onboardingCompleted = false; // New user triggers onboarding
       if (res && res.user) state.user.id = res.user.id;
 
       saveState();
-      showAuthStatus('Registrazione completata!', false);
-      showToast(`Benvenuto/a, ${firstName}! Registrazione eseguita.`);
-      setTimeout(() => {
-        authModal.classList.remove('open');
-        checkOnboardingStatus();
-      }, 800);
+      authModal?.classList.remove('open');
+      showToast(`Benvenuto/a, ${firstName}!`);
     } catch (err) {
-      showAuthStatus(err.message || 'Errore durante la registrazione', true);
+      showToast('Errore durante la registrazione');
     }
   });
 
-  // Logout Button
   document.getElementById('btnLogout')?.addEventListener('click', async () => {
     if (confirm('Sei sicuro di voler uscire dal tuo account?')) {
       await window.TimeReclaimSupabase.signOutUser();
-      state.user = { id: null, firstName: 'Ospite', lastName: '', email: '', avatar: 'TR', onboardingCompleted: false };
+      state.user = { id: null, firstName: 'Ospite', lastName: '', email: '', avatar: 'TR', streakDays: 1, noSocialHours: 0, freeTimeHours: 2 };
       saveState();
       showToast('Logout effettuato');
-      switchTab('agenda');
     }
   });
 
   // ==========================================================================
-  // 11. GLOBAL RENDER ALL FUNCTION
+  // 12. GLOBAL RENDER ALL FUNCTION
   // ==========================================================================
   function renderAll() {
-    const navAvatar = document.getElementById('navAvatar');
-    const navUserName = document.getElementById('navUserName');
-    if (navAvatar) navAvatar.textContent = state.user.avatar || 'TR';
-    if (navUserName) navUserName.textContent = state.user.firstName ? `${state.user.firstName}` : 'Accedi';
-
-    const todayDateEl = document.getElementById('agendaTodayDate');
-    if (todayDateEl) {
-      const options = { weekday: 'long', day: 'numeric', month: 'long' };
-      const todayStr = new Date().toLocaleDateString('it-IT', options);
-      todayDateEl.innerHTML = `<i class="fa-solid fa-clock" style="color: var(--accent-neon-cyan);"></i> Agenda - ${todayStr}`;
-    }
-
-    renderHorizontalTimeline();
-    renderRoutines();
-    renderCatalog();
+    renderHeaderDateAndChips();
+    renderSegmentedTimeline('agendaSegmentedTrack');
+    renderSegmentedTimeline('routineSegmentedTrack');
+    renderKPITrio();
+    renderSuggestedCarousels();
+    renderPlannedActivities();
+    renderActivityHistory();
     renderUserProfile();
   }
 
   // Boot Application
   renderAll();
-  checkOnboardingStatus();
 
 });

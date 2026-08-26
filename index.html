@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TimeReclaim | Visualizza e Proteggi il tuo Tempo Libero</title>
-  <meta name="description" content="Proteggi il tuo tempo libero con TimeReclaim. Agenda a timeline orizzontale, routine e sincronizzazione Google Calendar.">
+  <meta name="description" content="Proteggi il tuo tempo libero con TimeReclaim. Timeline segmentata 24h, routine pianificata, attività suggerite e storici.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,39 +38,62 @@
 
   <div class="app-container">
     
-    <!-- TOP MOBILE HEADER (CLEAN UI) -->
-    <header class="mobile-top-header">
-      <a href="#" class="brand">
-        <div class="brand-logo"><i class="fa-solid fa-hourglass-half"></i></div>
-        <div class="brand-text">
-          <h1>TimeReclaim</h1>
-          <p>Protect Your Free Time</p>
-        </div>
-      </a>
+    <!-- HEADER: TODAY & DATE + SELETTORE GIORNI (WIREFRAME 1 & 2) -->
+    <header class="header-today-section">
+      <div>
+        <h1 class="today-title">Today</h1>
+        <p class="today-date" id="currentFormattedDate">26 Agosto</p>
+      </div>
 
-      <!-- Quick Profile Button -->
-      <button class="header-user-btn" id="headerAvatarBtn">
-        <div class="user-avatar" id="navAvatar">TR</div>
-        <span class="user-name" id="navUserName">Accedi</span>
-      </button>
+      <!-- DAY CHIPS ROW (L M M G V S D) -->
+      <div class="day-chips-row" id="dayChipsRow">
+        <div class="day-chip-item">
+          <span class="day-chip-label">L</span>
+          <div class="day-chip-dot"></div>
+        </div>
+        <div class="day-chip-item">
+          <span class="day-chip-label">M</span>
+          <div class="day-chip-dot"></div>
+        </div>
+        <div class="day-chip-item active today">
+          <span class="day-chip-label">M</span>
+          <div class="day-chip-dot"></div>
+        </div>
+        <div class="day-chip-item">
+          <span class="day-chip-label">G</span>
+          <div class="day-chip-dot"></div>
+        </div>
+        <div class="day-chip-item">
+          <span class="day-chip-label">V</span>
+          <div class="day-chip-dot"></div>
+        </div>
+        <div class="day-chip-item">
+          <span class="day-chip-label">S</span>
+          <div class="day-chip-dot"></div>
+        </div>
+        <div class="day-chip-item">
+          <span class="day-chip-label">D</span>
+          <div class="day-chip-dot"></div>
+        </div>
+      </div>
     </header>
 
-    <!-- FIXED MOBILE BOTTOM NAVIGATION BAR (4 VISTE NATIVE) -->
+    <!-- FIXED MOBILE BOTTOM NAVIGATION BAR (4 VISTE WIREFRAME) -->
     <nav class="mobile-bottom-nav">
       <button class="nav-item active" data-tab="agenda">
-        <i class="fa-solid fa-calendar-day"></i>
+        <i class="fa-regular fa-calendar-check"></i>
         <span>Agenda</span>
       </button>
       <button class="nav-item" data-tab="routine">
-        <i class="fa-solid fa-arrows-spin"></i>
+        <i class="fa-solid fa-arrows-rotate"></i>
         <span>Routine</span>
       </button>
       <button class="nav-item" data-tab="catalog">
-        <i class="fa-solid fa-bookmark"></i>
+        <i class="fa-solid fa-person-running"></i>
         <span>Attività</span>
       </button>
       <button class="nav-item" data-tab="profile">
-        <i class="fa-solid fa-user"></i>
+        <i class="fa-regular fa-user"></i>
         <span>Profilo</span>
       </button>
     </nav>
@@ -79,189 +102,177 @@
     <main>
       
       <!-- ==========================================
-           VISTA 1: AGENDA (TIMELINE ORIZZONTALE CORE)
+           VISTA 1: AGENDA (WIREFRAME 1 LAYOUT)
            ========================================== -->
       <section id="view-agenda" class="view-section active">
         
-        <!-- Header Agenda -->
-        <div class="glass-card">
-          <div class="card-header" style="margin-bottom: 0;">
-            <div>
-              <h2 class="card-title" id="agendaTodayDate">
-                <i class="fa-solid fa-clock" style="color: var(--accent-neon-cyan);"></i>
-                Agenda di Oggi
-              </h2>
-              <p class="card-subtitle">Scorri per visualizzare la tua timeline giornaliera</p>
+        <!-- CARD TIMELINE SEGMENTATA 24H -->
+        <div class="glass-card segmented-timeline-card">
+          <div class="segmented-bar-track" id="agendaSegmentedTrack">
+            <!-- Dynamic segments generated via JS -->
+          </div>
+
+          <div class="timeline-legend-row">
+            <div class="legend-items-group">
+              <div class="legend-item">
+                <div class="legend-dot busy"></div>
+                <span>Busy time</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot free"></div>
+                <span>Free time</span>
+              </div>
             </div>
-            <span class="badge badge-cyan" id="agendaFreeBadge">3.5h Tempo Libero Protetto</span>
+
+            <button class="btn-glass btn-primary btn-sm" id="btnAgendaAddActivity">
+              <i class="fa-solid fa-plus"></i> Add activity
+            </button>
           </div>
         </div>
 
-        <!-- CORE COMPONENT: TIMELINE ORIZZONTALE SNAP-TO-CARD -->
-        <div class="glass-card">
-          <div class="card-header" style="margin-bottom: 0.5rem;">
-            <h3 class="card-title">
-              <i class="fa-solid fa-timeline" style="color: var(--accent-neon-cyan);"></i>
-              Timeline Giornaliera (Snap-to-Card)
-            </h3>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">👈 Scorri orizzontalmente</span>
+        <!-- TRITTICO KPI CARDS (WIREFRAME 1) -->
+        <div class="kpi-trio-grid">
+          <div class="kpi-trio-card">
+            <h4 class="kpi-trio-label">Free time</h4>
+            <span class="kpi-trio-value" id="kpiFreeTime">5 h</span>
           </div>
 
-          <div class="horizontal-timeline-wrapper" id="horizontalTimeline">
+          <div class="kpi-trio-card">
+            <h4 class="kpi-trio-label">No Social</h4>
+            <span class="kpi-trio-value" id="kpiNoSocial">15 h</span>
+          </div>
+
+          <div class="kpi-trio-card">
+            <h4 class="kpi-trio-label">Streak</h4>
+            <span class="kpi-trio-value" id="kpiStreak">x3 gg</span>
+          </div>
+        </div>
+
+        <!-- SEZIONE ATTIVITÀ SUGGERITE (HERO CAROUSEL CON IMMAGINI & ACCESSABILITÀ WCAG) -->
+        <div class="glass-card" style="margin-top: 1rem;">
+          <div class="card-header">
+            <h3 class="card-title">Attività suggerite</h3>
+          </div>
+
+          <div class="hero-activity-carousel" id="agendaSuggestedCarousel">
             <!-- Rendered dynamically via JS -->
           </div>
         </div>
 
-        <!-- Metric Summary -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="fa-solid fa-chart-simple" style="color: var(--accent-neon-lime);"></i> Riepilogo Giornaliero</h3>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
-            <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); padding: 0.85rem; border-radius: var(--radius-sm);">
-              <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Tempo Libero Tutelato</span>
-              <h4 id="summaryFreeTime" style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--accent-neon-cyan); font-weight: 800;">3.5 Ore</h4>
-            </div>
-
-            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); padding: 0.85rem; border-radius: var(--radius-sm);">
-              <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Impegni Fissi & Lavoro</span>
-              <h4 id="summaryDutyTime" style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--text-main); font-weight: 700;">8.0 Ore</h4>
-            </div>
-          </div>
-        </div>
-
       </section>
 
       <!-- ==========================================
-           VISTA 2: ROUTINE (PER MOMENTI)
+           VISTA 2: ROUTINE (WIREFRAME 2 LAYOUT)
            ========================================== -->
       <section id="view-routine" class="view-section">
-        <div class="glass-card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title"><i class="fa-solid fa-arrows-spin" style="color: var(--accent-neon-cyan);"></i> Routine & Abitudini Fisse</h2>
-              <p class="card-subtitle">Attiva o disattiva i blocchi divisi per momenti della giornata</p>
+        
+        <!-- BARRA TIMELINE COMPATTA SEGMENTATA (7:00 - 23:00) -->
+        <div class="glass-card segmented-timeline-card">
+          <div class="timeline-hours-ticks">
+            <span>7:00</span>
+            <span>23:00</span>
+          </div>
+
+          <div class="segmented-bar-track" id="routineSegmentedTrack">
+            <!-- Dynamic segments generated via JS -->
+          </div>
+
+          <div class="legend-items-group" style="margin-top: 0.25rem;">
+            <div class="legend-item">
+              <div class="legend-dot busy"></div>
+              <span>Busy time</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot free"></div>
+              <span>Free time</span>
             </div>
           </div>
         </div>
 
-        <!-- MOMENTO: MATTINA -->
+        <!-- DASHED CARD ADD ACTIVITY (WIREFRAME 2) -->
+        <div class="dashed-add-card" id="btnRoutineAddDashed" style="margin-bottom: 1rem;">
+          <i class="fa-solid fa-plus"></i> Add Activity
+        </div>
+
+        <!-- ATTIVITÀ PIANIFICATE (WIREFRAME 2) -->
         <div class="glass-card">
           <div class="card-header">
-            <h3 class="card-title" style="color: var(--accent-neon-cyan);"><i class="fa-solid fa-sun"></i> Mattina</h3>
+            <h3 class="card-title">Attività pianificate</h3>
           </div>
-          <div class="checklist-container" id="routineMorningList">
-            <!-- Dynamic Morning Routine Cards with Switches -->
+
+          <div class="planned-list" id="plannedActivitiesList">
+            <!-- Rendered dynamically via JS -->
           </div>
         </div>
 
-        <!-- MOMENTO: LAVORO -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title" style="color: var(--accent-blue);"><i class="fa-solid fa-briefcase"></i> Lavoro & Impegni</h3>
-          </div>
-          <div class="checklist-container" id="routineWorkList">
-            <!-- Dynamic Work Routine Cards with Switches -->
-          </div>
-        </div>
-
-        <!-- MOMENTO: SERA -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title" style="color: var(--accent-purple);"><i class="fa-solid fa-moon"></i> Sera & Relax</h3>
-          </div>
-          <div class="checklist-container" id="routineEveningList">
-            <!-- Dynamic Evening Routine Cards with Switches -->
-          </div>
-        </div>
       </section>
 
       <!-- ==========================================
-           VISTA 3: LIBRERIA ATTIVITÀ (TAG & DURATA)
+           VISTA 3: ATTIVITÀ (WIREFRAME 3 LAYOUT)
            ========================================== -->
       <section id="view-catalog" class="view-section">
+        
+        <!-- ATTIVITÀ SUGGERITE (CAROUSEL CON IMMAGINI - WIREFRAME 3) -->
         <div class="glass-card">
           <div class="card-header">
-            <div>
-              <h2 class="card-title"><i class="fa-solid fa-bookmark" style="color: var(--accent-neon-lime);"></i> Libreria Attività</h2>
-              <p class="card-subtitle">Catalogo delle attività salvate con tag e durata standard</p>
-            </div>
-            <button class="btn-glass btn-primary btn-sm" id="btnOpenNewCatalogModal">
-              <i class="fa-solid fa-plus"></i> Nuova Attività
-            </button>
+            <h3 class="card-title">Attività suggerite</h3>
           </div>
 
-          <div class="options-grid" id="catalogActivitiesGrid">
-            <!-- Rendered dynamically -->
+          <div class="hero-activity-carousel" id="catalogSuggestedCarousel">
+            <!-- Rendered dynamically via JS -->
           </div>
         </div>
+
+        <!-- STORICO ATTIVITÀ (WIREFRAME 3) -->
+        <div class="glass-card" style="margin-top: 1rem;">
+          <div class="card-header">
+            <h3 class="card-title">Storico Attività</h3>
+          </div>
+
+          <div class="history-list" id="historyActivitiesList">
+            <!-- Rendered dynamically via JS -->
+          </div>
+        </div>
+
       </section>
 
       <!-- ==========================================
-           VISTA 4: PROFILO & PROGRESSI
+           VISTA 4: PROFILO
            ========================================== -->
       <section id="view-profile" class="view-section">
-        <div style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
           
-          <div class="glass-card profile-card">
-            <div class="profile-avatar-large" id="profileAvatarLarge">TR</div>
-            <h2 class="profile-name" id="profileName">Alessandro Foti</h2>
-            <p class="profile-email" id="profileEmail">alessandro@esempio.com</p>
+          <div class="glass-card profile-card" style="text-align: center; padding: 1.5rem;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-purple), var(--accent-free-orange)); margin: 0 auto 0.75rem auto; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; color: #fff;" id="profileAvatarLarge">AF</div>
+            <h2 class="profile-name" id="profileName" style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800;">Alessandro Foti</h2>
+            <p class="profile-email" id="profileEmail" style="font-size: 0.85rem; color: var(--text-muted);">alessandro@esempio.com</p>
 
-            <div class="profile-badge" id="profileStatusBadge">
+            <div style="margin-top: 0.75rem; font-size: 0.8rem; color: var(--accent-neon-lime);" id="profileStatusBadge">
               <i class="fa-solid fa-cloud-check"></i> Supabase Cloud Connected
             </div>
           </div>
 
-          <!-- Protected Free Time Counter & Streaks -->
+          <!-- Google Calendar Sync Status -->
           <div class="glass-card">
             <div class="card-header">
-              <h3 class="card-title"><i class="fa-solid fa-shield-heart" style="color: var(--accent-neon-cyan);"></i> Tempo Libero Tutelato</h3>
+              <h3 class="card-title"><i class="fa-solid fa-calendar-plus" style="color: var(--accent-free-orange);"></i> Google Calendar Sync</h3>
             </div>
-
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
-              <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.3); padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
-                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Ore Tutelate questa Settimana</span>
-                <h3 id="profileWeeklyProtected" style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--accent-neon-cyan); font-weight: 800;">24.5 h</h3>
-              </div>
-
-              <div style="background: rgba(112, 224, 0, 0.08); border: 1px solid rgba(112, 224, 0, 0.3); padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
-                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Striscia di Costanza</span>
-                <h3 id="profileStreak" style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--accent-neon-lime); font-weight: 800;">🔥 5 Giorni</h3>
-              </div>
-            </div>
-          </div>
-
-          <!-- Google Calendar Integration & Account -->
-          <div class="glass-card">
-            <div class="card-header">
-              <h3 class="card-title"><i class="fa-solid fa-calendar-plus" style="color: var(--accent-neon-lime);"></i> Integrazione Google Calendar</h3>
-            </div>
-
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
-              Sincronizza automaticamente le nuove attività del Tempo Libero sul tuo Google Calendar.
-            </p>
-
-            <button class="btn-glass btn-secondary" id="btnLinkGoogleCalendar" style="width: 100%; justify-content: space-between;">
-              <span><i class="fa-brands fa-google"></i> Connetti Google Calendar (OAuth2)</span>
-              <span class="badge badge-lime" id="gcalStatusBadge">Collegato</span>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Sincronizza automaticamente le attività pianificate sul tuo Google Calendar.</p>
+            <button class="btn-glass btn-primary" id="btnLinkGoogleCalendar" style="width: 100%;">
+              <i class="fa-brands fa-google"></i> Connesso a Google Calendar (OAuth2)
             </button>
           </div>
 
           <!-- Account Actions -->
           <div class="glass-card">
-            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
-              <button class="btn-glass" id="btnOpenAuthFromProfile" style="width: 100%; justify-content: space-between;">
-                <span><i class="fa-solid fa-user-gear"></i> Accedi / Registrati</span>
-                <i class="fa-solid fa-chevron-right"></i>
-              </button>
-
-              <button class="btn-glass btn-danger" id="btnLogout" style="width: 100%; justify-content: space-between;">
-                <span><i class="fa-solid fa-right-from-bracket"></i> Esci dall'Account</span>
-                <i class="fa-solid fa-power-off"></i>
-              </button>
-            </div>
+            <button class="btn-glass" id="btnOpenAuthFromProfile" style="width: 100%; justify-content: space-between; margin-bottom: 0.65rem;">
+              <span><i class="fa-solid fa-user-gear"></i> Accedi / Registrati</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button class="btn-glass" id="btnLogout" style="width: 100%; justify-content: space-between; color: var(--accent-red); border-color: rgba(255,77,109,0.3);">
+              <span><i class="fa-solid fa-right-from-bracket"></i> Esci dall'Account</span>
+              <i class="fa-solid fa-power-off"></i>
+            </button>
           </div>
 
         </div>
@@ -269,170 +280,25 @@
 
     </main>
 
-    <!-- ==========================================
-         ONBOARDING MULTI-STEP WIZARD (6 STEPS)
-         ========================================== -->
-    <div class="onboarding-backdrop" id="onboardingWizard" style="display: none;">
-      <div class="onboarding-container">
-        
-        <!-- Progress Bar -->
-        <div class="onboarding-progress-header">
-          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-heading); font-weight: 700;">
-            <span id="onboardingStepTitle">Passo 1 di 6</span>
-            <span id="onboardingStepPercent">16%</span>
-          </div>
-          <div class="onboarding-progress-bar">
-            <div class="onboarding-progress-fill" id="onboardingProgressFill"></div>
-          </div>
-        </div>
-
-        <!-- STEP 1: WELCOME & CORE VALUE -->
-        <div class="onboarding-step-content active" id="onbStep1">
-          <div class="onboarding-hero-icon"><i class="fa-solid fa-shield-heart"></i></div>
-          <h2 class="onboarding-title">Benvenuto in TimeReclaim</h2>
-          <p class="onboarding-desc">
-            TimeReclaim non è una to-do list punitiva. È lo strumento progettato per aiutarti a visualizzare, valorizzare e **proteggere il tuo Tempo Libero**.
-          </p>
-
-          <div class="onboarding-actions">
-            <div></div>
-            <button class="btn-glass btn-primary" id="onbBtnStep1Next">Iniziamo <i class="fa-solid fa-arrow-right"></i></button>
-          </div>
-        </div>
-
-        <!-- STEP 2: DAILY RHYTHM -->
-        <div class="onboarding-step-content" id="onbStep2">
-          <h2 class="onboarding-title">A che ora inizia e finisce la tua giornata?</h2>
-          <p class="onboarding-desc">Imposta i tuoi orari base di veglia e sonno.</p>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
-            <div class="form-group">
-              <label class="form-label"><i class="fa-solid fa-sun" style="color: var(--accent-neon-cyan);"></i> Orario Sveglia</label>
-              <input type="time" class="input-glass" id="onbWakeTime" value="07:00">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label"><i class="fa-solid fa-moon" style="color: var(--accent-purple);"></i> Orario Sonno</label>
-              <input type="time" class="input-glass" id="onbSleepTime" value="23:00">
-            </div>
-          </div>
-
-          <div class="onboarding-actions">
-            <button class="btn-glass" id="onbBtnStep2Prev"><i class="fa-solid fa-arrow-left"></i> Indietro</button>
-            <button class="btn-glass btn-primary" id="onbBtnStep2Next">Avanti <i class="fa-solid fa-arrow-right"></i></button>
-          </div>
-        </div>
-
-        <!-- STEP 3: FIXED BLOCKS -->
-        <div class="onboarding-step-content" id="onbStep3">
-          <h2 class="onboarding-title">Quali sono i tuoi blocchi orari non negoziabili?</h2>
-          <p class="onboarding-desc">Seleziona o personalizza i tuoi impegni fissi quotidiani.</p>
-
-          <div class="form-group" style="margin-top: 1.5rem;">
-            <label class="form-label">Lavoro / Studio Principale</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-              <input type="time" class="input-glass" id="onbWorkStart" value="09:00">
-              <input type="time" class="input-glass" id="onbWorkEnd" value="18:00">
-            </div>
-          </div>
-
-          <div class="onboarding-actions">
-            <button class="btn-glass" id="onbBtnStep3Prev"><i class="fa-solid fa-arrow-left"></i> Indietro</button>
-            <button class="btn-glass btn-primary" id="onbBtnStep3Next">Avanti <i class="fa-solid fa-arrow-right"></i></button>
-          </div>
-        </div>
-
-        <!-- STEP 4: FREE TIME GOAL -->
-        <div class="onboarding-step-content" id="onbStep4">
-          <h2 class="onboarding-title">Quanto tempo libero desideri ritagliarti ogni giorno?</h2>
-          <p class="onboarding-desc">Scegli il tuo obiettivo di Tempo Libero da tutelare.</p>
-
-          <div class="form-group" style="margin-top: 1.5rem;">
-            <div class="range-container">
-              <div class="range-val-display">
-                <span>Obiettivo Giornaliero:</span>
-                <span id="onbFreeGoalVal" style="color: var(--accent-neon-cyan); font-size: 1.3rem;">3.0 Ore (180 min)</span>
-              </div>
-              <input type="range" class="input-range" id="onbFreeGoalInput" min="60" max="360" step="30" value="180">
-            </div>
-          </div>
-
-          <div class="onboarding-actions">
-            <button class="btn-glass" id="onbBtnStep4Prev"><i class="fa-solid fa-arrow-left"></i> Indietro</button>
-            <button class="btn-glass btn-primary" id="onbBtnStep4Next">Avanti <i class="fa-solid fa-arrow-right"></i></button>
-          </div>
-        </div>
-
-        <!-- STEP 5: NOTIFICATIONS & PREFERENCES -->
-        <div class="onboarding-step-content" id="onbStep5">
-          <h2 class="onboarding-title">Come preferisci ricevere i promemoria?</h2>
-          <p class="onboarding-desc">Personalizza le notifiche di incoraggiamento.</p>
-
-          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border);">
-              <div>
-                <h4 style="font-size: 0.95rem; font-weight: 700;">Notifiche Celebrative Streak</h4>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Ricevi notifiche quando raggiungi la costanza</p>
-              </div>
-              <label class="glass-switch">
-                <input type="checkbox" id="onbNotifyStreaks" checked>
-                <span class="switch-slider"></span>
-              </label>
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border);">
-              <div>
-                <h4 style="font-size: 0.95rem; font-weight: 700;">Riepilogo Settimanale</h4>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Ricevi una sintesi del tempo libero tutelato</p>
-              </div>
-              <label class="glass-switch">
-                <input type="checkbox" id="onbNotifyWeekly" checked>
-                <span class="switch-slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="onboarding-actions">
-            <button class="btn-glass" id="onbBtnStep5Prev"><i class="fa-solid fa-arrow-left"></i> Indietro</button>
-            <button class="btn-glass btn-primary" id="onbBtnStep5Next">Genera Timeline <i class="fa-solid fa-wand-magic-sparkles"></i></button>
-          </div>
-        </div>
-
-        <!-- STEP 6: TIMELINE GENERATION LOADING -->
-        <div class="onboarding-step-content" id="onbStep6">
-          <div style="text-align: center; padding: 2rem 0;">
-            <div class="onboarding-hero-icon" style="margin: 0 auto 1.5rem auto; animation: pulse 1.5s infinite;"><i class="fa-solid fa-hourglass-half"></i></div>
-            <h2 class="onboarding-title">Generazione della prima Timeline...</h2>
-            <p class="onboarding-desc">Stiamo componendo la tua giornata iniziale e proteggendo le tue ore di Tempo Libero.</p>
-
-            <div class="onboarding-progress-bar" style="margin-top: 2rem; height: 8px;">
-              <div class="onboarding-progress-fill" id="onbGenProgressFill" style="width: 0%;"></div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- QUICK ADD MODAL (FAB (+) ACTION) -->
+    <!-- QUICK ADD MODAL (FAB (+) & ADD ACTIVITY) -->
     <div class="modal-backdrop" id="quickAddModal">
       <div class="modal-glass">
         <div class="modal-header">
-          <h3 class="modal-title">Nuova Attività Rapida</h3>
+          <h3 class="modal-title">Nuova Attività</h3>
           <button class="btn-close-modal" id="btnCloseQuickAddModal"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <form id="formQuickAdd">
           <div class="form-group">
             <label class="form-label">Titolo Attività</label>
-            <input type="text" class="input-glass" id="quickActTitle" placeholder="es. Corsa al parco, Lettura" required>
+            <input type="text" class="input-glass" id="quickActTitle" placeholder="es. Yoga, Basket, Studio" required>
           </div>
 
           <div class="form-group">
             <label class="form-label">Tipo Attività</label>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-              <button type="button" class="btn-glass btn-primary btn-sm" id="btnTagFreeTime">✨ Tempo Libero</button>
-              <button type="button" class="btn-glass btn-secondary btn-sm" id="btnTagDuty">💼 Dovere / Lavoro</button>
+              <button type="button" class="btn-glass btn-accent-free btn-sm" id="btnTagFreeTime">🍊 Free time</button>
+              <button type="button" class="btn-glass btn-primary btn-sm" id="btnTagDuty">🔷 Busy time</button>
             </div>
           </div>
 
@@ -448,8 +314,8 @@
           </div>
 
           <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
-            <button type="submit" class="btn-glass btn-primary" style="width: 100%;">
-              <i class="fa-solid fa-check"></i> Salva nell'Agenda
+            <button type="submit" class="btn-glass btn-accent-free" style="width: 100%;">
+              <i class="fa-solid fa-check"></i> Salva Attività
             </button>
           </div>
         </form>
@@ -464,9 +330,9 @@
           <button class="btn-close-modal" id="btnCloseAuthModal"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <div class="nav-tabs" style="margin-bottom: 1rem; display: flex; width: 100%;">
-          <button class="nav-btn active" id="tabAuthLogin" style="flex: 1;">Accedi</button>
-          <button class="nav-btn" id="tabAuthRegister" style="flex: 1;">Registrati</button>
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+          <button class="btn-glass btn-sm" id="tabAuthLogin" style="flex: 1;">Accedi</button>
+          <button class="btn-glass btn-sm" id="tabAuthRegister" style="flex: 1;">Registrati</button>
         </div>
 
         <div id="authStatusBanner" style="display: none; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1rem;"></div>
@@ -477,10 +343,7 @@
             <input type="email" class="input-glass" id="loginEmail" placeholder="nome@esempio.com" required>
           </div>
           <div class="form-group">
-            <div style="display: flex; justify-content: space-between;">
-              <label class="form-label">Password</label>
-              <a href="#" id="linkForgotPassword" style="font-size: 0.75rem; color: var(--accent-neon-cyan);">Recupera password</a>
-            </div>
+            <label class="form-label">Password</label>
             <input type="password" class="input-glass" id="loginPassword" placeholder="••••••••" required>
           </div>
           <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 0.5rem;">Accedi</button>
@@ -506,18 +369,6 @@
             <input type="password" class="input-glass" id="regPassword" placeholder="Almeno 6 caratteri" minlength="6" required>
           </div>
           <button type="submit" class="btn-glass btn-primary" style="width: 100%; margin-top: 0.5rem;">Crea Account</button>
-        </form>
-
-        <form id="formForgotPassword" style="display: none;">
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Inserisci la tua email per ricevere il link di recupero password.</p>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" class="input-glass" id="forgotEmail" placeholder="nome@esempio.com" required>
-          </div>
-          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-            <button type="button" class="btn-glass" id="btnBackToLogin" style="flex: 1;">Indietro</button>
-            <button type="submit" class="btn-glass btn-danger" style="flex: 1.5;">Invia Reset</button>
-          </div>
         </form>
       </div>
     </div>
